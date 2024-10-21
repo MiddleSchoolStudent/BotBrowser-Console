@@ -4,11 +4,6 @@
     "compileOnSave": false,
     "compilerOptions": {
         "outDir": "./dist/out-tsc",
-        "strict": true,
-        "noImplicitOverride": true,
-        "noPropertyAccessFromIndexSignature": true,
-        "noImplicitReturns": true,
-        "noFallthroughCasesInSwitch": true,
         "skipLibCheck": true,
         "isolatedModules": true,
         "esModuleInterop": true,
@@ -19,7 +14,26 @@
         "importHelpers": true,
         "target": "ES2022",
         "module": "ES2022",
-        "lib": ["ES2022", "dom"]
+        "lib": ["ES2022", "dom"],
+
+        // Stylistic Configuration
+        // Loosened settings are marked with an asterisk (*)
+        "strictNullChecks": true,
+        "allowUnreachableCode": true,
+        "allowUnusedLabels": false,
+        "alwaysStrict": true,
+        "exactOptionalPropertyTypes": false, // *
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noPropertyAccessFromIndexSignature": false, // *
+        "noUncheckedIndexedAccess": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "verbatimModuleSyntax": true,
+        "strict": true
     },
     "angularCompilerOptions": {
         "enableI18nLegacyMessageIdFormat": false,

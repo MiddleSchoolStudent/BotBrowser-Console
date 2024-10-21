@@ -1,0 +1,181 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Edit' : 'Create' }} Browser Profile</h2>
+<mat-dialog-content class="mat-typography">
+    <mat-stepper orientation="vertical" #stepper>
+        <!-- Basic info -->
+        <mat-step [stepControl]="basicInfoFormGroup">
+            <form [formGroup]="basicInfoFormGroup">
+                <ng-template matStepLabel>Fill out profile name</ng-template>
+                <mat-form-field>
+                    <mat-label>Name</mat-label>
+                    <input
+                        matInput
+                        placeholder="Profile name"
+                        formControlName="profileName"
+                        required
+                    />
+                </mat-form-field>
+
+                <mat-form-field>
+                    <mat-label>Description</mat-label>
+                    <textarea
+                        matInput
+                        formControlName="description"
+                        placeholder="Type a description"
+                    ></textarea>
+                </mat-form-field>
+
+                <div>
+                    <button mat-button matStepperNext>Next</button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Import profile -->
+        <mat-step [stepControl]="profileInfoGroup">
+            <form [formGroup]="profileInfoGroup">
+                <ng-template matStepLabel>
+                    {{ isEdit ? 'Replace profile' : 'Import profile' }}
+                </ng-template>
+                <mat-label></mat-label>
+                <mat-file-upload
+                    [labelText]="'Select a profile to upload:'"
+                    [selectButtonText]="'Choose File'"
+                    [allowMultipleFiles]="false"
+                    [showUploadButton]="false"
+                    [acceptedTypes]="'.json'"
+                    (selectedFilesChanged)="onSelectedFilesChanged($event)"
+                ></mat-file-upload>
+                <div>
+                    <button mat-button matStepperNext>Next</button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Proxy info -->
+        <mat-step [stepControl]="proxyInfoGroup">
+            <form [formGroup]="proxyInfoGroup">
+                <ng-template matStepLabel>Fill out proxy info</ng-template>
+                <mat-form-field>
+                    <mat-label>Proxy</mat-label>
+                    <input
+                        matInput
+                        placeholder="Proxy host"
+                        formControlName="proxyHost"
+                    />
+                </mat-form-field>
+
+                <mat-form-field>
+                    <mat-label>Username</mat-label>
+                    <input
+                        matInput
+                        placeholder="Proxy user name"
+                        formControlName="username"
+                    />
+                </mat-form-field>
+
+                <mat-form-field>
+                    <mat-label>Port</mat-label>
+                    <input
+                        matInput
+                        placeholder="Proxy password"
+                        formControlName="password"
+                    />
+                </mat-form-field>
+                <div>
+                    <button mat-button matStepperNext>Next</button>
+                </div>
+            </form>
+        </mat-step>
+
+        <!-- Variable info -->
+        <mat-step [stepControl]="variablesInfoGroup">
+            <form [formGroup]="variablesInfoGroup">
+                <ng-template matStepLabel>Fill out variable info</ng-template>
+                <mat-form-field>
+                    <mat-label>Locale</mat-label>
+                    <input
+                        matInput
+                        placeholder="Input locale"
+                        formControlName="locale"
+                        [matAutocomplete]="localeAuto"
+                    />
+                    <mat-autocomplete
+                        autoActiveFirstOption
+                        #localeAuto="matAutocomplete"
+                    >
+                        @for (option of filteredLocales | async; track option) {
+                            <mat-option [value]="option">
+                                {{ option }}
+                            </mat-option>
+                        }
+                    </mat-autocomplete>
+                </mat-form-field>
+
+                <mat-form-field>
+                    <mat-label>Timezone</mat-label>
+                    <input
+                        matInput
+                        placeholder="Input timezone"
+                        formControlName="timezone"
+                        [matAutocomplete]="timezoneAuto"
+                    />
+                    <mat-autocomplete
+                        autoActiveFirstOption
+                        #timezoneAuto="matAutocomplete"
+                    >
+                        @for (
+                            option of filteredTimezones | async;
+                            track option
+                        ) {
+                            <mat-option [value]="option">
+                                {{ option }}
+                            </mat-option>
+                        }
+                    </mat-autocomplete>
+                </mat-form-field>
+
+                <p>
+                    <mat-checkbox formControlName="disableConsoleMessage">
+                        Disable Console Message to prevent detection
+                    </mat-checkbox>
+                </p>
+
+                <p>
+                    <mat-checkbox formControlName="noisesCanvas2d">
+                        Noises Canvas 2D
+                    </mat-checkbox>
+                </p>
+
+                <p>
+                    <mat-checkbox formControlName="noisesCanvasWebgl">
+                        Noises Canvas WebGL
+                    </mat-checkbox>
+                </p>
+
+                <p>
+                    <mat-checkbox formControlName="noisesClientRectsFactor">
+                        Noises Client Rects Factor
+                    </mat-checkbox>
+                </p>
+
+                <p>
+                    <mat-checkbox formControlName="noisesTextMetricsFactor">
+                        Noises Text Metrics Factor
+                    </mat-checkbox>
+                </p>
+
+                <p>
+                    <mat-checkbox formControlName="noisesAudio">
+                        Noises Audio
+                    </mat-checkbox>
+                </p>
+            </form>
+        </mat-step>
+    </mat-stepper>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-button [mat-dialog-close]="true" cdkFocusInitial>
+        {{ isEdit ? 'Save' : 'Create' }}
+    </button>
+</mat-dialog-actions>
