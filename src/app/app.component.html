@@ -2,10 +2,20 @@
     <mat-toolbar>
         <span>BotBrowser</span>
         <span class="spacer"></span>
+
+        <!-- new profile -->
         <button mat-button (click)="newProfile()">
             <mat-icon>add</mat-icon>
             New Profile
         </button>
+
+        <!-- import profile -->
+        <button mat-button (click)="importProfile()">
+            <mat-icon>download</mat-icon>
+            Import Profile
+        </button>
+
+        <!-- delete profile  -->
         <button mat-button (click)="deleteProfiles()">
             <mat-icon>delete</mat-icon>
             Delete Profiles

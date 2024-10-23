@@ -34,11 +34,11 @@
         <mat-step [stepControl]="profileInfoGroup">
             <form [formGroup]="profileInfoGroup">
                 <ng-template matStepLabel>
-                    {{ isEdit ? 'Replace profile' : 'Import profile' }}
+                    {{ isEdit ? 'Replace fingerprint' : 'Select fingerprint' }}
                 </ng-template>
                 <mat-label></mat-label>
                 <mat-file-upload
-                    [labelText]="'Select a profile to upload:'"
+                    [labelText]="'Select a fingerprint file:'"
                     [selectButtonText]="'Choose File'"
                     [allowMultipleFiles]="false"
                     [showUploadButton]="false"
@@ -59,7 +59,7 @@
                     <mat-label>Proxy</mat-label>
                     <input
                         matInput
-                        placeholder="Proxy host"
+                        placeholder="host:port"
                         formControlName="proxyHost"
                     />
                 </mat-form-field>
@@ -74,7 +74,7 @@
                 </mat-form-field>
 
                 <mat-form-field>
-                    <mat-label>Port</mat-label>
+                    <mat-label>Password</mat-label>
                     <input
                         matInput
                         placeholder="Proxy password"

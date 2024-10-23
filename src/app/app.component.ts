@@ -59,6 +59,8 @@ export class AppComponent implements AfterViewInit {
         });
     }
 
+    importProfile(): void {}
+
     deleteProfiles(): void {}
 
     ngAfterViewInit() {
