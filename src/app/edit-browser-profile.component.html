@@ -175,7 +175,12 @@
 </mat-dialog-content>
 <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close>Cancel</button>
-    <button mat-button [mat-dialog-close]="true" cdkFocusInitial>
+    <button
+        mat-button
+        [mat-dialog-close]="true"
+        cdkFocusInitial
+        (click)="onConfirmClick()"
+    >
         {{ isEdit ? 'Save' : 'Create' }}
     </button>
 </mat-dialog-actions>

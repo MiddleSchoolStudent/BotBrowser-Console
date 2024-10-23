@@ -10,7 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { EditBrowserProfileComponent } from './edit-browser-profile/edit-browser-profile.component';
+import { EditBrowserProfileComponent } from './edit-browser-profile.component';
 import { formatDateTime } from './utils';
 import type { BrowserProfile } from './data/browser-profile';
 import { SelectionModel } from '@angular/cdk/collections';

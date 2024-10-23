@@ -14,8 +14,8 @@ import {
     ReactiveFormsModule,
 } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
-import * as localesJson from '../data/locales.json';
-import * as timezonesJson from '../data/timezones.json';
+import * as localesJson from './data/locales.json';
+import * as timezonesJson from './data/timezones.json';
 import { map, startWith, type Observable } from 'rxjs';
 import type {
     BrowserProfile,
@@ -23,7 +23,7 @@ import type {
     ProfileInfo,
     ProxyInfo,
     VariablesInfo,
-} from '../data/browser-profile';
+} from './data/browser-profile';
 
 @Component({
     selector: 'app-edit-browser-profile',
@@ -121,7 +121,17 @@ export class EditBrowserProfileComponent {
             ) as Observable<string[]>;
     }
 
-    onSelectedFilesChanged(_files: FileList): void {
-        console.log(_files);
+    onSelectedFilesChanged(files: FileList): void {
+        const file = files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const content = event.target?.result as string;
+        };
+        reader.onerror = (event) => {};
+        reader.readAsText(file);
     }
+
+    onConfirmClick(): void {}
 }
