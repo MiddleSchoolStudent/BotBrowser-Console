@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import {
     MatDialogModule,
@@ -10,7 +10,7 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatFileUploadModule } from 'mat-file-upload';
+import { MatFileUploadComponent, MatFileUploadModule } from 'mat-file-upload';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import {
     FormBuilder,
@@ -18,7 +18,7 @@ import {
     FormsModule,
     ReactiveFormsModule,
 } from '@angular/forms';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, CommonModule } from '@angular/common';
 import * as localesJson from './data/locales.json';
 import * as timezonesJson from './data/timezones.json';
 import { map, startWith, type Observable } from 'rxjs';
@@ -35,13 +35,14 @@ import {
     type BotProfileBasicInfo,
 } from './data/bot-profile';
 import { AlertDialogComponent } from './shared/alert-dialog.component';
-import { DBService } from './service/db.service';
+import { DBService } from './shared/db.service';
 import { v4 as uuidv4 } from 'uuid';
 
 @Component({
     selector: 'app-edit-browser-profile',
     standalone: true,
     imports: [
+        CommonModule,
         MatDialogModule,
         FormsModule,
         ReactiveFormsModule,
@@ -59,6 +60,12 @@ import { v4 as uuidv4 } from 'uuid';
 })
 export class EditBrowserProfileComponent {
     readonly #formBuilder = inject(FormBuilder);
+    readonly #dialog = inject(MatDialog);
+    readonly #dbService = inject(DBService);
+    readonly dialogRef = inject(MatDialogRef<EditBrowserProfileComponent>);
+
+    @ViewChild('botProfileUpload', { static: true })
+    botProfileUpload!: MatFileUploadComponent;
 
     readonly basicInfoFormGroup: FormGroup;
     readonly botProfileInfoGroup: FormGroup;
@@ -76,11 +83,7 @@ export class EditBrowserProfileComponent {
     isEdit = false;
     botProfileBasicInfo: BotProfileBasicInfo | null = null;
 
-    constructor(
-        private dialog: MatDialog,
-        private dbService: DBService,
-        public dialogRef: MatDialogRef<EditBrowserProfileComponent>
-    ) {
+    constructor() {
         // init form data
         this.basicInfoFormGroup = this.#formBuilder.group<BasicInfo>({
             profileName:
@@ -174,9 +177,10 @@ export class EditBrowserProfileComponent {
             const content = event.target?.result as string;
             const botProfileBasicInfo = tryParseBotProfile(content);
             if (!botProfileBasicInfo) {
-                this.dialog.open(AlertDialogComponent, {
+                this.#dialog.open(AlertDialogComponent, {
                     data: { message: 'Invalid bot profile file' },
                 });
+                this.botProfileUpload.resetFileInput();
                 return;
             }
 
@@ -205,7 +209,7 @@ export class EditBrowserProfileComponent {
             updatedAt: Date.now(),
         };
 
-        await this.dbService.saveBrowserProfile(browserProfile);
+        await this.#dbService.saveBrowserProfile(browserProfile);
         this.dialogRef.close();
     }
 }

@@ -21,8 +21,9 @@ import {
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
-import { DBService } from './service/db.service';
+import { DBService } from './shared/db.service';
 import { CommonModule } from '@angular/common';
+import { StopPropagationDirective } from './shared/stop-propagation.directive';
 
 @Component({
     selector: 'app-root',
@@ -38,6 +39,7 @@ import { CommonModule } from '@angular/common';
         MatCheckboxModule,
         MatToolbarModule,
         MatIconModule,
+        StopPropagationDirective,
     ],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
@@ -84,13 +86,37 @@ export class AppComponent implements AfterViewInit {
         });
     }
 
+    editSelectedProfile(): void {
+        if (this.selection.selected.length !== 1) {
+            throw new Error('Please select one profile to edit');
+        }
+
+        this.editProfile(this.selection.selected[0]!);
+    }
+
+    toggleSelectProfile(browserProfile: BrowserProfile): void {
+        this.selection.toggle(browserProfile);
+    }
+
     importProfile(): void {}
 
-    deleteProfiles(): void {}
+    deleteProfiles(): void {
+        if (this.selection.selected.length === 0) {
+            throw new Error('Please select profiles to delete');
+        }
+    }
 
     async refreshProfiles(): Promise<void> {
         const profiles = await this.dbService.getAllBrowserProfiles();
+        const selectedIds = this.selection.selected.map(
+            (profile) => profile.id
+        );
         this.dataSource.data = profiles;
+
+        this.selection.clear();
+        this.selection.select(
+            ...profiles.filter((profile) => selectedIds.includes(profile.id))
+        );
     }
 
     async ngAfterViewInit() {

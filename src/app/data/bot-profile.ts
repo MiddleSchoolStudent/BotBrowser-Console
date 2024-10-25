@@ -6,7 +6,7 @@ export interface BotProfileBasicInfo {
 export function tryParseBotProfile(data: string): BotProfileBasicInfo | null {
     try {
         const info = JSON.parse(data);
-        const version = info.version;
+        const version = info.profileVersion;
         const userAgent = info.fingerprints.browser.navigator.userAgent;
         if (typeof version === 'string' && typeof userAgent === 'string') {
             return { version, userAgent };

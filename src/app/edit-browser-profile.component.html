@@ -32,12 +32,17 @@
 
         <!-- Import profile -->
         <mat-step [stepControl]="botProfileInfoGroup">
+            <div *ngIf="botProfileBasicInfo">
+                <p>Version: {{ botProfileBasicInfo.version }}</p>
+                <p>User Agent: {{ botProfileBasicInfo.userAgent }}</p>
+            </div>
             <form [formGroup]="botProfileInfoGroup">
                 <ng-template matStepLabel>
                     {{ isEdit ? 'Replace bot profile' : 'Select bot profile' }}
                 </ng-template>
                 <mat-label></mat-label>
                 <mat-file-upload
+                    #botProfileUpload
                     [labelText]="'Select a bot profile:'"
                     [selectButtonText]="'Choose File'"
                     [allowMultipleFiles]="false"

@@ -9,6 +9,16 @@
             New Profile
         </button>
 
+        <!-- new profile -->
+        <button
+            mat-button
+            (click)="editSelectedProfile()"
+            [disabled]="selection.selected.length != 1"
+        >
+            <mat-icon>edit</mat-icon>
+            Edit Profile
+        </button>
+
         <!-- import profile -->
         <button mat-button (click)="importProfile()">
             <mat-icon>download</mat-icon>
@@ -16,7 +26,11 @@
         </button>
 
         <!-- delete profile  -->
-        <button mat-button (click)="deleteProfiles()">
+        <button
+            mat-button
+            (click)="deleteProfiles()"
+            [disabled]="selection.selected.length == 0"
+        >
             <mat-icon>delete</mat-icon>
             Delete Profiles
         </button>
@@ -53,7 +67,11 @@
                     <span class="content">
                         {{ element.basicInfo.profileName }}
                     </span>
-                    <button mat-icon-button [matMenuTriggerFor]="menu">
+                    <button
+                        mat-icon-button
+                        [matMenuTriggerFor]="menu"
+                        app-stop-propagation
+                    >
                         <mat-icon>more_vert</mat-icon>
                     </button>
                 </div>
@@ -130,8 +148,15 @@
         </ng-container>
 
         <!-- header -->
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumns; sticky: true"
+        ></tr>
+        <tr
+            mat-row
+            *matRowDef="let element; columns: displayedColumns"
+            (click)="toggleSelectProfile(element)"
+        ></tr>
     </table>
 </main>
 
