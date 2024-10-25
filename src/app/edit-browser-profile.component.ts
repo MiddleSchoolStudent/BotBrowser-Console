@@ -37,6 +37,7 @@ import {
 import { AlertDialogComponent } from './shared/alert-dialog.component';
 import { DBService } from './shared/db.service';
 import { v4 as uuidv4 } from 'uuid';
+import { ConfirmDialogComponent } from './shared/confirm-dialog.component';
 
 @Component({
     selector: 'app-edit-browser-profile',
@@ -91,8 +92,7 @@ export class EditBrowserProfileComponent {
             description: this.#injectedData?.basicInfo.description || '',
         });
         this.botProfileInfoGroup = this.#formBuilder.group<BotProfileInfo>({
-            botProfileContent:
-                this.#injectedData?.botProfileInfo.botProfileContent,
+            content: this.#injectedData?.botProfileInfo.content,
         });
 
         this.proxyInfoGroup = this.#formBuilder.group<ProxyInfo>({
@@ -160,9 +160,9 @@ export class EditBrowserProfileComponent {
                 throw new Error('Cannot edit a running profile');
             }
 
-            if (this.#injectedData.botProfileInfo.botProfileContent) {
+            if (this.#injectedData.botProfileInfo.content) {
                 this.botProfileBasicInfo = tryParseBotProfile(
-                    this.#injectedData.botProfileInfo.botProfileContent
+                    this.#injectedData.botProfileInfo.content
                 );
             }
         }
@@ -172,26 +172,50 @@ export class EditBrowserProfileComponent {
         const file = files[0];
         if (!file) return;
 
+        if (!this.isEdit || !this.#injectedData?.botProfileInfo.content) {
+            this.#handleFileSelection(file);
+            return;
+        }
+
+        // Re-selecting an existing botprofile may result in an unknown antibot error
+        this.#dialog
+            .open(ConfirmDialogComponent, {
+                data: {
+                    message:
+                        'Re-selecting an existing bot profile may result in an unknown antibot error. Are you sure you want to proceed?',
+                },
+            })
+            .afterClosed()
+            .subscribe((result: boolean) => {
+                if (!result) return;
+
+                this.#handleFileSelection(file);
+            });
+    }
+
+    #handleFileSelection(file: File): void {
         const reader = new FileReader();
         reader.onload = (event) => {
             const content = event.target?.result as string;
             const botProfileBasicInfo = tryParseBotProfile(content);
             if (!botProfileBasicInfo) {
                 this.#dialog.open(AlertDialogComponent, {
-                    data: { message: 'Invalid bot profile file' },
+                    data: { message: 'Invalid bot profile file.' },
                 });
                 this.botProfileUpload.resetFileInput();
                 return;
             }
 
             this.botProfileBasicInfo = botProfileBasicInfo;
-            this.botProfileInfoGroup
-                .get('botProfileContent')
-                ?.setValue(content);
+            this.botProfileInfoGroup.get('content')?.setValue(content);
+            this.botProfileInfoGroup.get('filename')?.setValue(file.name);
+            this.botProfileUpload.resetFileInput();
         };
+
         reader.onerror = (event) => {
             console.error('Error reading file:', event);
         };
+
         reader.readAsText(file);
     }
 

@@ -4,8 +4,8 @@ export interface BasicInfo {
 }
 
 export interface BotProfileInfo {
-    botProfilePath?: string;
-    botProfileContent?: string;
+    filename?: string;
+    content?: string;
 }
 
 export interface ProxyInfo {
