@@ -3,9 +3,9 @@ export interface BasicInfo {
     description?: string;
 }
 
-export interface ProfileInfo {
-    profilePath?: string;
-    profileContent?: any;
+export interface BotProfileInfo {
+    botProfilePath?: string;
+    botProfileContent?: string;
 }
 
 export interface ProxyInfo {
@@ -30,10 +30,22 @@ export enum BrowserProfileStatus {
     Running = 1,
 }
 
+export const BrowserProfileStatusText = {
+    [BrowserProfileStatus.Stopped]: 'Stopped',
+    [BrowserProfileStatus.Running]: 'Running',
+};
+
+export function getBrowserProfileStatusText(
+    status: BrowserProfileStatus
+): string {
+    return BrowserProfileStatusText[status];
+}
+
 export interface BrowserProfile {
+    id: string;
     status?: BrowserProfileStatus;
     basicInfo: BasicInfo;
-    profileInfo: ProfileInfo;
+    botProfileInfo: BotProfileInfo;
     proxyInfo: ProxyInfo;
     variablesInfo: VariablesInfo;
     createdAt: number;

@@ -7,22 +7,31 @@ import {
 import { RouterOutlet } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { EditBrowserProfileComponent } from './edit-browser-profile.component';
 import { formatDateTime } from './utils';
-import type { BrowserProfile } from './data/browser-profile';
+import {
+    BrowserProfileStatus,
+    getBrowserProfileStatusText,
+    type BrowserProfile,
+} from './data/browser-profile';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
+import { DBService } from './service/db.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-root',
     standalone: true,
     imports: [
+        CommonModule,
         RouterOutlet,
         MatButtonModule,
+        MatMenuModule,
         MatDialogModule,
         MatTableModule,
         MatSortModule,
@@ -35,6 +44,8 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class AppComponent implements AfterViewInit {
     readonly formatDateTime = formatDateTime;
+    readonly getBrowserProfileStatusText = getBrowserProfileStatusText;
+    readonly BrowserProfileStatus = BrowserProfileStatus;
     readonly dialog = inject(MatDialog);
     readonly displayedColumns = [
         'select',
@@ -51,11 +62,25 @@ export class AppComponent implements AfterViewInit {
 
     title = 'BotBrowser-Console';
 
+    constructor(private readonly dbService: DBService) {}
+
     newProfile(): void {
         const dialogRef = this.dialog.open(EditBrowserProfileComponent);
 
         dialogRef.afterClosed().subscribe((result) => {
             console.log(`Dialog result: ${result}`);
+            this.refreshProfiles().then().catch(console.error);
+        });
+    }
+
+    editProfile(browserProfile: BrowserProfile): void {
+        const dialogRef = this.dialog.open(EditBrowserProfileComponent, {
+            data: browserProfile,
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            console.log(`Dialog result: ${result}`);
+            this.refreshProfiles().then().catch(console.error);
         });
     }
 
@@ -63,8 +88,14 @@ export class AppComponent implements AfterViewInit {
 
     deleteProfiles(): void {}
 
-    ngAfterViewInit() {
+    async refreshProfiles(): Promise<void> {
+        const profiles = await this.dbService.getAllBrowserProfiles();
+        this.dataSource.data = profiles;
+    }
+
+    async ngAfterViewInit() {
         this.dataSource.sort = this.sort;
+        await this.refreshProfiles();
     }
 
     get isAllSelected(): boolean {

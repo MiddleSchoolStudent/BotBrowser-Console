@@ -31,19 +31,19 @@
         </mat-step>
 
         <!-- Import profile -->
-        <mat-step [stepControl]="profileInfoGroup">
-            <form [formGroup]="profileInfoGroup">
+        <mat-step [stepControl]="botProfileInfoGroup">
+            <form [formGroup]="botProfileInfoGroup">
                 <ng-template matStepLabel>
-                    {{ isEdit ? 'Replace fingerprint' : 'Select fingerprint' }}
+                    {{ isEdit ? 'Replace bot profile' : 'Select bot profile' }}
                 </ng-template>
                 <mat-label></mat-label>
                 <mat-file-upload
-                    [labelText]="'Select a fingerprint file:'"
+                    [labelText]="'Select a bot profile:'"
                     [selectButtonText]="'Choose File'"
                     [allowMultipleFiles]="false"
                     [showUploadButton]="false"
                     [acceptedTypes]="'.json'"
-                    (selectedFilesChanged)="onSelectedFilesChanged($event)"
+                    (selectedFilesChanged)="onSelectedBotProfileChanged($event)"
                 ></mat-file-upload>
                 <div>
                     <button mat-button matStepperNext>Next</button>
