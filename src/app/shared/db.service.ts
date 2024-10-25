@@ -1,6 +1,7 @@
 import { openDB, type IDBPDatabase } from 'idb';
 import { Injectable } from '@angular/core';
 import type { BrowserProfile } from '../data/browser-profile';
+import { AppName } from '../const';
 
 @Injectable({ providedIn: 'root' })
 export class DBService {
@@ -8,7 +9,7 @@ export class DBService {
 
     async getDB(): Promise<IDBPDatabase> {
         if (!this.#db) {
-            this.#db = await openDB('bot-browser-console', 1, {
+            this.#db = await openDB(AppName, 1, {
                 upgrade(db) {
                     if (!db.objectStoreNames.contains('browserProfiles')) {
                         db.createObjectStore('browserProfiles', {

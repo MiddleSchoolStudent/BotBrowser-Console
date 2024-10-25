@@ -24,6 +24,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { DBService } from './shared/db.service';
 import { CommonModule } from '@angular/common';
 import { StopPropagationDirective } from './shared/stop-propagation.directive';
+import { AppName } from './const';
+import { ConfirmDialogComponent } from './shared/confirm-dialog.component';
 
 @Component({
     selector: 'app-root',
@@ -40,15 +42,17 @@ import { StopPropagationDirective } from './shared/stop-propagation.directive';
         MatToolbarModule,
         MatIconModule,
         StopPropagationDirective,
+        ConfirmDialogComponent,
     ],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
 })
 export class AppComponent implements AfterViewInit {
+    readonly AppName = AppName;
+    readonly #dialog = inject(MatDialog);
     readonly formatDateTime = formatDateTime;
     readonly getBrowserProfileStatusText = getBrowserProfileStatusText;
     readonly BrowserProfileStatus = BrowserProfileStatus;
-    readonly dialog = inject(MatDialog);
     readonly displayedColumns = [
         'select',
         'name',
@@ -62,12 +66,10 @@ export class AppComponent implements AfterViewInit {
 
     @ViewChild(MatSort) sort!: MatSort;
 
-    title = 'BotBrowser-Console';
-
     constructor(private readonly dbService: DBService) {}
 
     newProfile(): void {
-        const dialogRef = this.dialog.open(EditBrowserProfileComponent);
+        const dialogRef = this.#dialog.open(EditBrowserProfileComponent);
 
         dialogRef.afterClosed().subscribe((result) => {
             console.log(`Dialog result: ${result}`);
@@ -76,7 +78,7 @@ export class AppComponent implements AfterViewInit {
     }
 
     editProfile(browserProfile: BrowserProfile): void {
-        const dialogRef = this.dialog.open(EditBrowserProfileComponent, {
+        const dialogRef = this.#dialog.open(EditBrowserProfileComponent, {
             data: browserProfile,
         });
 
@@ -104,6 +106,23 @@ export class AppComponent implements AfterViewInit {
         if (this.selection.selected.length === 0) {
             throw new Error('Please select profiles to delete');
         }
+
+        this.#dialog
+            .open(ConfirmDialogComponent, {
+                data: {
+                    message:
+                        'Are you sure you want to delete the selected profiles?',
+                },
+            })
+            .afterClosed()
+            .subscribe(async (result: boolean) => {
+                if (!result) return;
+
+                await this.dbService.deleteBrowserProfiles(
+                    this.selection.selected.map((profile) => profile.id)
+                );
+                await this.refreshProfiles();
+            });
     }
 
     async refreshProfiles(): Promise<void> {
