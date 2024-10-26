@@ -1,31 +1,34 @@
+import { SelectionModel } from '@angular/cdk/collections';
+import { CommonModule } from '@angular/common';
 import {
     Component,
     inject,
     ViewChild,
     type AfterViewInit,
 } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { EditBrowserProfileComponent } from './edit-browser-profile.component';
-import { formatDateTime } from './utils';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { RouterOutlet } from '@angular/router';
+import { cloneDeep } from 'lodash-es';
+import { v4 as uuidv4 } from 'uuid';
+import { CloneBrowserProfileComponent } from './clone-browser-profile.component';
+import { AppName } from './const';
 import {
     BrowserProfileStatus,
     getBrowserProfileStatusText,
     type BrowserProfile,
 } from './data/browser-profile';
-import { SelectionModel } from '@angular/cdk/collections';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatIconModule } from '@angular/material/icon';
-import { DBService } from './shared/db.service';
-import { CommonModule } from '@angular/common';
-import { StopPropagationDirective } from './shared/stop-propagation.directive';
-import { AppName } from './const';
+import { EditBrowserProfileComponent } from './edit-browser-profile.component';
 import { ConfirmDialogComponent } from './shared/confirm-dialog.component';
+import { DBService } from './shared/db.service';
+import { StopPropagationDirective } from './shared/stop-propagation.directive';
+import { formatDateTime } from './utils';
 
 @Component({
     selector: 'app-root',
@@ -50,6 +53,7 @@ import { ConfirmDialogComponent } from './shared/confirm-dialog.component';
 export class AppComponent implements AfterViewInit {
     readonly AppName = AppName;
     readonly #dialog = inject(MatDialog);
+    readonly #dbService = inject(DBService);
     readonly formatDateTime = formatDateTime;
     readonly getBrowserProfileStatusText = getBrowserProfileStatusText;
     readonly BrowserProfileStatus = BrowserProfileStatus;
@@ -66,26 +70,28 @@ export class AppComponent implements AfterViewInit {
 
     @ViewChild(MatSort) sort!: MatSort;
 
-    constructor(private readonly dbService: DBService) {}
+    constructor() {}
 
     newProfile(): void {
-        const dialogRef = this.#dialog.open(EditBrowserProfileComponent);
-
-        dialogRef.afterClosed().subscribe((result) => {
-            console.log(`Dialog result: ${result}`);
-            this.refreshProfiles().then().catch(console.error);
-        });
+        this.#dialog
+            .open(EditBrowserProfileComponent)
+            .afterClosed()
+            .subscribe((result) => {
+                console.log(`Dialog result: ${result}`);
+                this.refreshProfiles().then().catch(console.error);
+            });
     }
 
     editProfile(browserProfile: BrowserProfile): void {
-        const dialogRef = this.#dialog.open(EditBrowserProfileComponent, {
-            data: browserProfile,
-        });
-
-        dialogRef.afterClosed().subscribe((result) => {
-            console.log(`Dialog result: ${result}`);
-            this.refreshProfiles().then().catch(console.error);
-        });
+        this.#dialog
+            .open(EditBrowserProfileComponent, {
+                data: browserProfile,
+            })
+            .afterClosed()
+            .subscribe((result) => {
+                console.log(`Dialog result: ${result}`);
+                this.refreshProfiles().then().catch(console.error);
+            });
     }
 
     editSelectedProfile(): void {
@@ -101,6 +107,25 @@ export class AppComponent implements AfterViewInit {
     }
 
     importProfile(): void {}
+
+    cloneProfile(browserProfile: BrowserProfile): void {
+        this.#dialog
+            .open(CloneBrowserProfileComponent)
+            .afterClosed()
+            .subscribe(async (result: number) => {
+                await Promise.all(
+                    Array.from({ length: result }).map(() => {
+                        const newProfile = cloneDeep(browserProfile);
+                        newProfile.id = uuidv4();
+                        newProfile.createdAt = Date.now();
+                        newProfile.updatedAt = Date.now();
+                        return this.#dbService.saveBrowserProfile(newProfile);
+                    })
+                );
+
+                await this.refreshProfiles();
+            });
+    }
 
     deleteProfiles(): void {
         if (this.selection.selected.length === 0) {
@@ -118,7 +143,7 @@ export class AppComponent implements AfterViewInit {
             .subscribe(async (result: boolean) => {
                 if (!result) return;
 
-                await this.dbService.deleteBrowserProfiles(
+                await this.#dbService.deleteBrowserProfiles(
                     this.selection.selected.map((profile) => profile.id)
                 );
                 await this.refreshProfiles();
@@ -126,7 +151,7 @@ export class AppComponent implements AfterViewInit {
     }
 
     async refreshProfiles(): Promise<void> {
-        const profiles = await this.dbService.getAllBrowserProfiles();
+        const profiles = await this.#dbService.getAllBrowserProfiles();
         const selectedIds = this.selection.selected.map(
             (profile) => profile.id
         );

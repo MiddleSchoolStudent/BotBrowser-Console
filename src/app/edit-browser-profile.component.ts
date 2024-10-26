@@ -63,7 +63,7 @@ export class EditBrowserProfileComponent {
     readonly #formBuilder = inject(FormBuilder);
     readonly #dialog = inject(MatDialog);
     readonly #dbService = inject(DBService);
-    readonly dialogRef = inject(MatDialogRef<EditBrowserProfileComponent>);
+    readonly #dialogRef = inject(MatDialogRef<EditBrowserProfileComponent>);
 
     @ViewChild('botProfileUpload', { static: true })
     botProfileUpload!: MatFileUploadComponent;
@@ -235,6 +235,6 @@ export class EditBrowserProfileComponent {
         };
 
         await this.#dbService.saveBrowserProfile(browserProfile);
-        this.dialogRef.close();
+        this.#dialogRef.close();
     }
 }

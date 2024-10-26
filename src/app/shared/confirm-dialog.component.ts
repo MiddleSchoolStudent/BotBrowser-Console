@@ -1,5 +1,5 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, inject, Inject } from '@angular/core';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -31,8 +31,9 @@ import { MatFileUploadModule } from 'mat-file-upload';
     templateUrl: './confirm-dialog.component.html',
 })
 export class ConfirmDialogComponent {
+    readonly #dialogRef = inject(MatDialogRef<ConfirmDialogComponent>);
+
     constructor(
-        public dialogRef: MatDialogRef<ConfirmDialogComponent>,
         @Inject(MAT_DIALOG_DATA)
         public data: {
             title?: string;
@@ -44,10 +45,10 @@ export class ConfirmDialogComponent {
     ) {}
 
     onOk(): void {
-        this.dialogRef.close(true);
+        this.#dialogRef.close(true);
     }
 
     onCancel(): void {
-        this.dialogRef.close(false);
+        this.#dialogRef.close(false);
     }
 }
