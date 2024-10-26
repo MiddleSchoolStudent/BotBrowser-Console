@@ -37,6 +37,7 @@ export class ConfirmDialogComponent {
         public data: {
             title?: string;
             message: string;
+            defaultCancel?: boolean;
             okButtonText?: string;
             cancelButtonText?: string;
         }

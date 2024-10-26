@@ -181,6 +181,7 @@ export class EditBrowserProfileComponent {
         this.#dialog
             .open(ConfirmDialogComponent, {
                 data: {
+                    defaultCancel: true,
                     message:
                         'Re-selecting an existing bot profile may result in an unknown antibot error. Are you sure you want to proceed?',
                 },
