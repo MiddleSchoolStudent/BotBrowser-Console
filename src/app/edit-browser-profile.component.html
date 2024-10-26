@@ -32,10 +32,13 @@
 
         <!-- Import profile -->
         <mat-step [stepControl]="botProfileInfoGroup">
-            <div *ngIf="botProfileBasicInfo">
-                <p>Version: {{ botProfileBasicInfo.version }}</p>
-                <p>User Agent: {{ botProfileBasicInfo.userAgent }}</p>
-            </div>
+            @if (botProfileBasicInfo) {
+                <div>
+                    <p>Version: {{ botProfileBasicInfo.version }}</p>
+                    <p>User Agent: {{ botProfileBasicInfo.userAgent }}</p>
+                </div>
+            }
+
             <form [formGroup]="botProfileInfoGroup">
                 <ng-template matStepLabel>
                     {{ isEdit ? 'Replace bot profile' : 'Select bot profile' }}

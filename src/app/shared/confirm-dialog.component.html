@@ -1,7 +1,12 @@
-<h2 mat-dialog-title *ngIf="data.title">{{ data.title }}</h2>
+@if (data.title) {
+    <h2 mat-dialog-title>
+        {{ data.title }}
+    </h2>
+}
+
 <mat-dialog-content> {{ data.message }} </mat-dialog-content>
 <mat-dialog-actions>
-    <ng-container *ngIf="data.defaultCancel; else defaultOk">
+    @if (data.defaultCancel) {
         <button
             mat-button
             mat-dialog-close
@@ -13,13 +18,12 @@
         <button mat-button mat-dialog-close (click)="onOk()">
             {{ data.okButtonText || 'OK' }}
         </button>
-    </ng-container>
-    <ng-template #defaultOk>
+    } @else {
         <button mat-button mat-dialog-close (click)="onCancel()">
             {{ data.cancelButtonText || 'Cancel' }}
         </button>
         <button mat-button mat-dialog-close cdkFocusInitial (click)="onOk()">
             {{ data.okButtonText || 'OK' }}
         </button>
-    </ng-template>
+    }
 </mat-dialog-actions>
