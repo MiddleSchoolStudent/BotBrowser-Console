@@ -46,6 +46,7 @@
                 <mat-label></mat-label>
                 <mat-file-upload
                     #botProfileUpload
+                    [acceptedTypes]="'.json, .enc'"
                     [labelText]="'Select a bot profile:'"
                     [selectButtonText]="'Choose File'"
                     [allowMultipleFiles]="false"
