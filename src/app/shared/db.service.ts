@@ -1,65 +1,68 @@
-import { openDB, type IDBPDatabase } from 'idb';
 import { Injectable } from '@angular/core';
+import * as Neutralino from '@neutralinojs/lib';
 import type { BrowserProfile } from '../data/browser-profile';
-import { AppName } from '../const';
+
+const kBrowserProfilePrefix = 'browserProfiles';
 
 @Injectable({ providedIn: 'root' })
 export class DBService {
-    #db: IDBPDatabase | null = null;
-
-    async getDB(): Promise<IDBPDatabase> {
-        if (!this.#db) {
-            this.#db = await openDB(AppName, 1, {
-                upgrade(db) {
-                    if (!db.objectStoreNames.contains('browserProfiles')) {
-                        db.createObjectStore('browserProfiles', {
-                            keyPath: 'id',
-                        });
-                    }
-                },
-            });
-        }
-
-        return this.#db;
-    }
-
     async saveBrowserProfile(browserProfile: BrowserProfile): Promise<void> {
-        const db = await this.getDB();
-        const tx = db.transaction('browserProfiles', 'readwrite');
-        const store = tx.objectStore('browserProfiles');
-        await store.put(browserProfile);
-        await tx.done;
+        await Neutralino.storage.setData(
+            `${kBrowserProfilePrefix}_${browserProfile.id}`,
+            JSON.stringify(browserProfile)
+        );
     }
 
     async getAllBrowserProfiles(): Promise<BrowserProfile[]> {
-        const db = await this.getDB();
-        return await db.getAll('browserProfiles');
+        const keys = (await Neutralino.storage.getKeys()).filter((key) =>
+            key.startsWith(kBrowserProfilePrefix)
+        );
+        const result = await Promise.all(
+            keys.map(async (key) => {
+                const browserProfile = await Neutralino.storage.getData(key);
+                return JSON.parse(browserProfile);
+            })
+        );
+
+        result.sort((a, b) => b.createdAt - a.createdAt);
+        return result;
     }
 
-    async getBrowserProfile(id: string): Promise<BrowserProfile | undefined> {
-        const db = await this.getDB();
-        return await db.get('browserProfiles', id);
+    async getBrowserProfile(
+        browserProfile: string | BrowserProfile
+    ): Promise<BrowserProfile | undefined> {
+        const id =
+            typeof browserProfile === 'string'
+                ? browserProfile
+                : browserProfile.id;
+
+        const browserProfileData = await Neutralino.storage.getData(
+            `${kBrowserProfilePrefix}_${id}`
+        );
+        return JSON.parse(browserProfileData);
     }
 
-    async deleteBrowserProfile(id: string | BrowserProfile): Promise<void> {
-        if (typeof id !== 'string') {
-            id = id.id;
-        }
+    async deleteBrowserProfile(
+        browserProfile: string | BrowserProfile
+    ): Promise<void> {
+        const id =
+            typeof browserProfile === 'string'
+                ? browserProfile
+                : browserProfile.id;
 
-        const db = await this.getDB();
-        const tx = db.transaction('browserProfiles', 'readwrite');
-        const store = tx.objectStore('browserProfiles');
-        await store.delete(id);
-        await tx.done;
+        await Neutralino.storage.setData(
+            `${kBrowserProfilePrefix}_${id}`,
+            null as any
+        );
     }
 
-    async deleteBrowserProfiles(ids: string[]): Promise<void> {
-        const db = await this.getDB();
-        const tx = db.transaction('browserProfiles', 'readwrite');
-        const store = tx.objectStore('browserProfiles');
-        for (const id of ids) {
-            await store.delete(id);
-        }
-        await tx.done;
+    async deleteBrowserProfiles(
+        browserProfiles: (string | BrowserProfile)[]
+    ): Promise<void> {
+        await Promise.all(
+            browserProfiles.map((browserProfile) =>
+                this.deleteBrowserProfile(browserProfile)
+            )
+        );
     }
 }
