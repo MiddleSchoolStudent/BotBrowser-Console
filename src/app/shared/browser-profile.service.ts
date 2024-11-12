@@ -4,7 +4,7 @@ import type { BrowserProfile } from '../data/browser-profile';
 import { AppName } from '../const';
 
 @Injectable({ providedIn: 'root' })
-export class DBService {
+export class BrowserProfileService {
     async getBrowserProfilePath(): Promise<string> {
         const systemDataPath = await Neutralino.os.getPath('data');
         const appDataPath = `${systemDataPath}/${AppName}/browser-profiles`;

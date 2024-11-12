@@ -26,7 +26,7 @@ import {
 } from './data/browser-profile';
 import { EditBrowserProfileComponent } from './edit-browser-profile.component';
 import { ConfirmDialogComponent } from './shared/confirm-dialog.component';
-import { DBService } from './shared/db.service';
+import { BrowserProfileService } from './shared/browser-profile.service';
 import { StopPropagationDirective } from './shared/stop-propagation.directive';
 import { formatDateTime } from './utils';
 
@@ -53,7 +53,7 @@ import { formatDateTime } from './utils';
 export class AppComponent implements AfterViewInit {
     readonly AppName = AppName;
     readonly #dialog = inject(MatDialog);
-    readonly #dbService = inject(DBService);
+    readonly #dbService = inject(BrowserProfileService);
     readonly formatDateTime = formatDateTime;
     readonly getBrowserProfileStatusText = getBrowserProfileStatusText;
     readonly BrowserProfileStatus = BrowserProfileStatus;

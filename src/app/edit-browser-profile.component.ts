@@ -37,7 +37,7 @@ import * as localesJson from './data/locales.json';
 import * as timezonesJson from './data/timezones.json';
 import { AlertDialogComponent } from './shared/alert-dialog.component';
 import { ConfirmDialogComponent } from './shared/confirm-dialog.component';
-import { DBService } from './shared/db.service';
+import { BrowserProfileService } from './shared/browser-profile.service';
 
 @Component({
     selector: 'app-edit-browser-profile',
@@ -61,7 +61,7 @@ import { DBService } from './shared/db.service';
 export class EditBrowserProfileComponent {
     readonly #formBuilder = inject(FormBuilder);
     readonly #dialog = inject(MatDialog);
-    readonly #dbService = inject(DBService);
+    readonly #dbService = inject(BrowserProfileService);
     readonly #dialogRef = inject(MatDialogRef<EditBrowserProfileComponent>);
 
     readonly basicInfoFormGroup: FormGroup;
