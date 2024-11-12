@@ -1,26 +1,42 @@
 import { Injectable } from '@angular/core';
 import * as Neutralino from '@neutralinojs/lib';
 import type { BrowserProfile } from '../data/browser-profile';
-
-const kBrowserProfilePrefix = 'browserProfiles';
+import { AppName } from '../const';
 
 @Injectable({ providedIn: 'root' })
 export class DBService {
+    async getBrowserProfilePath(): Promise<string> {
+        const systemDataPath = await Neutralino.os.getPath('data');
+        const appDataPath = `${systemDataPath}/${AppName}/browser-profiles`;
+
+        try {
+            await Neutralino.filesystem.getStats(appDataPath);
+        } catch {
+            await Neutralino.filesystem.createDirectory(appDataPath);
+        }
+
+        return appDataPath;
+    }
+
     async saveBrowserProfile(browserProfile: BrowserProfile): Promise<void> {
-        await Neutralino.storage.setData(
-            `${kBrowserProfilePrefix}_${browserProfile.id}`,
+        const browserProfilePath = await this.getBrowserProfilePath();
+        await Neutralino.filesystem.writeFile(
+            `${browserProfilePath}/${browserProfile.id}.json`,
             JSON.stringify(browserProfile)
         );
     }
 
     async getAllBrowserProfiles(): Promise<BrowserProfile[]> {
-        const keys = (await Neutralino.storage.getKeys()).filter((key) =>
-            key.startsWith(kBrowserProfilePrefix)
-        );
+        const browserProfilePath = await this.getBrowserProfilePath();
+        const entries =
+            await Neutralino.filesystem.readDirectory(browserProfilePath);
+
         const result = await Promise.all(
-            keys.map(async (key) => {
-                const browserProfile = await Neutralino.storage.getData(key);
-                return JSON.parse(browserProfile);
+            entries.map(async (entry) => {
+                const content = await Neutralino.filesystem.readFile(
+                    entry.path
+                );
+                return JSON.parse(content);
             })
         );
 
@@ -36,10 +52,11 @@ export class DBService {
                 ? browserProfile
                 : browserProfile.id;
 
-        const browserProfileData = await Neutralino.storage.getData(
-            `${kBrowserProfilePrefix}_${id}`
+        const browserProfilePath = await this.getBrowserProfilePath();
+        const content = await Neutralino.filesystem.readFile(
+            `${browserProfilePath}/${id}.json`
         );
-        return JSON.parse(browserProfileData);
+        return JSON.parse(content);
     }
 
     async deleteBrowserProfile(
@@ -50,10 +67,8 @@ export class DBService {
                 ? browserProfile
                 : browserProfile.id;
 
-        await Neutralino.storage.setData(
-            `${kBrowserProfilePrefix}_${id}`,
-            null as any
-        );
+        const browserProfilePath = await this.getBrowserProfilePath();
+        await Neutralino.filesystem.remove(`${browserProfilePath}/${id}.json`);
     }
 
     async deleteBrowserProfiles(
