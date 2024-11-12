@@ -43,17 +43,8 @@
                 <ng-template matStepLabel>
                     {{ isEdit ? 'Replace bot profile' : 'Select bot profile' }}
                 </ng-template>
-                <mat-label></mat-label>
-                <mat-file-upload
-                    #botProfileUpload
-                    [acceptedTypes]="'.json, .enc'"
-                    [labelText]="'Select a bot profile:'"
-                    [selectButtonText]="'Choose File'"
-                    [allowMultipleFiles]="false"
-                    [showUploadButton]="false"
-                    [acceptedTypes]="'.json'"
-                    (selectedFilesChanged)="onSelectedBotProfileChanged($event)"
-                ></mat-file-upload>
+                <mat-label>Select a bot profile:</mat-label>
+                <button mat-button (click)="chooseFile()">Choose File</button>
                 <div>
                     <button mat-button matStepperNext>Next</button>
                 </div>

@@ -1,43 +1,43 @@
-import { Component, inject, ViewChild } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import {
-    MatDialogModule,
-    MAT_DIALOG_DATA,
-    MatDialog,
-    MatDialogRef,
-} from '@angular/material/dialog';
-import { MatStepperModule } from '@angular/material/stepper';
-import { MatInputModule } from '@angular/material/input';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatFileUploadComponent, MatFileUploadModule } from 'mat-file-upload';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { AsyncPipe, CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import {
     FormBuilder,
     FormGroup,
     FormsModule,
     ReactiveFormsModule,
 } from '@angular/forms';
-import { AsyncPipe, CommonModule } from '@angular/common';
-import * as localesJson from './data/locales.json';
-import * as timezonesJson from './data/timezones.json';
-import { map, startWith, type Observable } from 'rxjs';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import {
-    type BrowserProfile,
-    type BasicInfo,
-    type BotProfileInfo,
-    type ProxyInfo,
-    type VariablesInfo,
-    BrowserProfileStatus,
-} from './data/browser-profile';
+    MAT_DIALOG_DATA,
+    MatDialog,
+    MatDialogModule,
+    MatDialogRef,
+} from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatStepperModule } from '@angular/material/stepper';
+import * as Neutralino from '@neutralinojs/lib';
+import { map, startWith, type Observable } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 import {
     tryParseBotProfile,
     type BotProfileBasicInfo,
 } from './data/bot-profile';
+import {
+    BrowserProfileStatus,
+    type BasicInfo,
+    type BotProfileInfo,
+    type BrowserProfile,
+    type ProxyInfo,
+    type VariablesInfo,
+} from './data/browser-profile';
+import * as localesJson from './data/locales.json';
+import * as timezonesJson from './data/timezones.json';
 import { AlertDialogComponent } from './shared/alert-dialog.component';
-import { DBService } from './shared/db.service';
-import { v4 as uuidv4 } from 'uuid';
 import { ConfirmDialogComponent } from './shared/confirm-dialog.component';
+import { DBService } from './shared/db.service';
 
 @Component({
     selector: 'app-edit-browser-profile',
@@ -52,7 +52,6 @@ import { ConfirmDialogComponent } from './shared/confirm-dialog.component';
         MatCheckboxModule,
         MatButtonModule,
         MatStepperModule,
-        MatFileUploadModule,
         MatAutocompleteModule,
         AsyncPipe,
     ],
@@ -64,9 +63,6 @@ export class EditBrowserProfileComponent {
     readonly #dialog = inject(MatDialog);
     readonly #dbService = inject(DBService);
     readonly #dialogRef = inject(MatDialogRef<EditBrowserProfileComponent>);
-
-    @ViewChild('botProfileUpload', { static: true })
-    botProfileUpload!: MatFileUploadComponent;
 
     readonly basicInfoFormGroup: FormGroup;
     readonly botProfileInfoGroup: FormGroup;
@@ -168,12 +164,16 @@ export class EditBrowserProfileComponent {
         }
     }
 
-    onSelectedBotProfileChanged(files: FileList): void {
-        const file = files[0];
-        if (!file) return;
+    async chooseFile(): Promise<void> {
+        const entries = await Neutralino.os.showOpenDialog('Select a profile', {
+            filters: [{ name: 'Profiles', extensions: ['json', 'enc'] }],
+            multiSelections: false,
+        });
+        const entry = entries[0];
+        if (!entry) return;
 
         if (!this.isEdit || !this.#injectedData?.botProfileInfo.content) {
-            this.#handleFileSelection(file);
+            this.#handleFileSelection(entry);
             return;
         }
 
@@ -189,35 +189,24 @@ export class EditBrowserProfileComponent {
             .afterClosed()
             .subscribe((result: boolean) => {
                 if (!result) return;
-
-                this.#handleFileSelection(file);
+                this.#handleFileSelection(entry);
             });
     }
 
-    #handleFileSelection(file: File): void {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const content = event.target?.result as string;
+    #handleFileSelection(filePath: string): void {
+        Neutralino.filesystem.readFile(filePath).then((content) => {
             const botProfileBasicInfo = tryParseBotProfile(content);
             if (!botProfileBasicInfo) {
                 this.#dialog.open(AlertDialogComponent, {
                     data: { message: 'Invalid bot profile file.' },
                 });
-                this.botProfileUpload.resetFileInput();
                 return;
             }
 
             this.botProfileBasicInfo = botProfileBasicInfo;
             this.botProfileInfoGroup.get('content')?.setValue(content);
-            this.botProfileInfoGroup.get('filename')?.setValue(file.name);
-            this.botProfileUpload.resetFileInput();
-        };
-
-        reader.onerror = (event) => {
-            console.error('Error reading file:', event);
-        };
-
-        reader.readAsText(file);
+            this.botProfileInfoGroup.get('filename')?.setValue(filePath);
+        });
     }
 
     async onConfirmClick(): Promise<void> {

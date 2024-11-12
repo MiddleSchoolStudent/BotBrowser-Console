@@ -1,4 +1,4 @@
-import { CommonModule, AsyncPipe } from '@angular/common';
+import { AsyncPipe, CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -8,7 +8,6 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatStepperModule } from '@angular/material/stepper';
-import { MatFileUploadModule } from 'mat-file-upload';
 
 @Component({
     selector: 'app-clone-browser-profile',
@@ -23,7 +22,6 @@ import { MatFileUploadModule } from 'mat-file-upload';
         MatCheckboxModule,
         MatButtonModule,
         MatStepperModule,
-        MatFileUploadModule,
         MatAutocompleteModule,
         AsyncPipe,
     ],

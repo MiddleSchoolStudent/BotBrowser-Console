@@ -11,7 +11,6 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatStepperModule } from '@angular/material/stepper';
-import { MatFileUploadModule } from 'mat-file-upload';
 
 @Component({
     selector: 'app-confirm-dialog',
@@ -24,7 +23,6 @@ import { MatFileUploadModule } from 'mat-file-upload';
         MatCheckboxModule,
         MatButtonModule,
         MatStepperModule,
-        MatFileUploadModule,
         MatAutocompleteModule,
         AsyncPipe,
     ],
