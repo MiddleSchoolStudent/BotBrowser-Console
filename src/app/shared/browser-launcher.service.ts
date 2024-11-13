@@ -83,6 +83,9 @@ export class BrowserLauncherService {
             throw new Error('The profile is already running');
         }
 
+        browserProfile.lastUsedAt = Date.now();
+        await this.#browserProfileService.saveBrowserProfile(browserProfile);
+
         const browserProfilePath =
             await this.#browserProfileService.getBrowserProfilePath(
                 browserProfile
