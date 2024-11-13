@@ -15,6 +15,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterOutlet } from '@angular/router';
+import * as Neutralino from '@neutralinojs/lib';
 import { cloneDeep } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 import { CloneBrowserProfileComponent } from './clone-browser-profile.component';
@@ -25,10 +26,11 @@ import {
     type BrowserProfile,
 } from './data/browser-profile';
 import { EditBrowserProfileComponent } from './edit-browser-profile.component';
-import { ConfirmDialogComponent } from './shared/confirm-dialog.component';
+import { BrowserLauncherService } from './shared/browser-launcher.service';
 import { BrowserProfileService } from './shared/browser-profile.service';
+import { ConfirmDialogComponent } from './shared/confirm-dialog.component';
 import { StopPropagationDirective } from './shared/stop-propagation.directive';
-import { formatDateTime } from './utils';
+import { compressFolder, decompressZip, formatDateTime } from './utils';
 
 @Component({
     selector: 'app-root',
@@ -51,9 +53,11 @@ import { formatDateTime } from './utils';
     styleUrl: './app.component.scss',
 })
 export class AppComponent implements AfterViewInit {
+    readonly #browserProfileService = inject(BrowserProfileService);
+    readonly browserLauncherService = inject(BrowserLauncherService);
+
     readonly AppName = AppName;
     readonly #dialog = inject(MatDialog);
-    readonly #dbService = inject(BrowserProfileService);
     readonly formatDateTime = formatDateTime;
     readonly getBrowserProfileStatusText = getBrowserProfileStatusText;
     readonly BrowserProfileStatus = BrowserProfileStatus;
@@ -106,8 +110,6 @@ export class AppComponent implements AfterViewInit {
         this.selection.toggle(browserProfile);
     }
 
-    importProfile(): void {}
-
     cloneProfile(browserProfile: BrowserProfile): void {
         this.#dialog
             .open(CloneBrowserProfileComponent)
@@ -119,12 +121,41 @@ export class AppComponent implements AfterViewInit {
                         newProfile.id = uuidv4();
                         newProfile.createdAt = Date.now();
                         newProfile.updatedAt = Date.now();
-                        return this.#dbService.saveBrowserProfile(newProfile);
+                        return this.#browserProfileService.saveBrowserProfile(
+                            newProfile
+                        );
                     })
                 );
 
                 await this.refreshProfiles();
             });
+    }
+
+    async exportProfile(browserProfile: BrowserProfile): Promise<void> {
+        const entry = await Neutralino.os.showSaveDialog(
+            'Export browser profile',
+            { filters: [{ name: 'Zip', extensions: ['zip'] }] }
+        );
+
+        const browserProfilePath =
+            await this.#browserProfileService.getBrowserProfilePath(
+                browserProfile
+            );
+        await compressFolder(browserProfilePath, entry);
+    }
+
+    async importProfile(): Promise<void> {
+        const entry = await Neutralino.os.showOpenDialog(
+            'Import a browser profile',
+            { filters: [{ name: 'Zip', extensions: ['zip'] }] }
+        );
+
+        if (!entry?.[0]) return;
+
+        const browserProfilePath =
+            await this.#browserProfileService.getBasePath();
+        await decompressZip(entry[0], browserProfilePath);
+        await this.refreshProfiles();
     }
 
     deleteProfiles(): void {
@@ -143,7 +174,7 @@ export class AppComponent implements AfterViewInit {
             .subscribe(async (result: boolean) => {
                 if (!result) return;
 
-                await this.#dbService.deleteBrowserProfiles(
+                await this.#browserProfileService.deleteBrowserProfiles(
                     this.selection.selected.map((profile) => profile.id)
                 );
                 await this.refreshProfiles();
@@ -151,7 +182,8 @@ export class AppComponent implements AfterViewInit {
     }
 
     async refreshProfiles(): Promise<void> {
-        const profiles = await this.#dbService.getAllBrowserProfiles();
+        const profiles =
+            await this.#browserProfileService.getAllBrowserProfiles();
         const selectedIds = this.selection.selected.map(
             (profile) => profile.id
         );
@@ -163,7 +195,7 @@ export class AppComponent implements AfterViewInit {
         );
     }
 
-    async ngAfterViewInit() {
+    async ngAfterViewInit(): Promise<void> {
         this.dataSource.sort = this.sort;
         await this.refreshProfiles();
     }
@@ -174,7 +206,7 @@ export class AppComponent implements AfterViewInit {
         return numSelected === numRows;
     }
 
-    toggleAllRows() {
+    toggleAllRows(): void {
         if (this.isAllSelected) {
             this.selection.clear();
             return;
@@ -188,5 +220,13 @@ export class AppComponent implements AfterViewInit {
             return `${this.isAllSelected ? 'deselect' : 'select'} all`;
         }
         return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row`;
+    }
+
+    async runBrowserProfile(browserProfile: BrowserProfile): Promise<void> {
+        await this.browserLauncherService.run(browserProfile);
+    }
+
+    async stopBrowserProfile(browserProfile: BrowserProfile): Promise<void> {
+        await this.browserLauncherService.stop(browserProfile);
     }
 }

@@ -19,6 +19,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatStepperModule } from '@angular/material/stepper';
 import * as Neutralino from '@neutralinojs/lib';
+import { shuffle } from 'lodash-es';
 import { map, startWith, type Observable } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -36,8 +37,9 @@ import {
 import * as localesJson from './data/locales.json';
 import * as timezonesJson from './data/timezones.json';
 import { AlertDialogComponent } from './shared/alert-dialog.component';
-import { ConfirmDialogComponent } from './shared/confirm-dialog.component';
+import { BrowserLauncherService } from './shared/browser-launcher.service';
 import { BrowserProfileService } from './shared/browser-profile.service';
+import { ConfirmDialogComponent } from './shared/confirm-dialog.component';
 
 @Component({
     selector: 'app-edit-browser-profile',
@@ -59,9 +61,11 @@ import { BrowserProfileService } from './shared/browser-profile.service';
     styleUrl: './edit-browser-profile.component.scss',
 })
 export class EditBrowserProfileComponent {
+    readonly #browserProfileService = inject(BrowserProfileService);
+    readonly #browserLauncherService = inject(BrowserLauncherService);
+
     readonly #formBuilder = inject(FormBuilder);
     readonly #dialog = inject(MatDialog);
-    readonly #dbService = inject(BrowserProfileService);
     readonly #dialogRef = inject(MatDialogRef<EditBrowserProfileComponent>);
 
     readonly basicInfoFormGroup: FormGroup;
@@ -88,6 +92,7 @@ export class EditBrowserProfileComponent {
             description: this.#injectedData?.basicInfo.description || '',
         });
         this.botProfileInfoGroup = this.#formBuilder.group<BotProfileInfo>({
+            filename: this.#injectedData?.botProfileInfo.filename || '',
             content: this.#injectedData?.botProfileInfo.content,
         });
 
@@ -152,7 +157,11 @@ export class EditBrowserProfileComponent {
 
         if (this.#injectedData) {
             this.isEdit = true;
-            if (this.#injectedData.status === BrowserProfileStatus.Running) {
+
+            const status = this.#browserLauncherService.getRunningStatus(
+                this.#injectedData
+            );
+            if (status !== BrowserProfileStatus.Idle) {
                 throw new Error('Cannot edit a running profile');
             }
 
@@ -212,18 +221,28 @@ export class EditBrowserProfileComponent {
     async onConfirmClick(): Promise<void> {
         // TODO: check form data
 
-        const browserProfile = {
+        const browserProfile: BrowserProfile = {
             id: this.#injectedData?.id || uuidv4(),
-            status: BrowserProfileStatus.Stopped,
             basicInfo: this.basicInfoFormGroup.value,
             botProfileInfo: this.botProfileInfoGroup.value,
             proxyInfo: this.proxyInfoGroup.value,
             variablesInfo: this.variablesInfoGroup.value,
+            variableValues: this.#injectedData?.variableValues || {
+                storageQuotaInBytes:
+                    596797550000 + Math.floor(Math.random() * 1000000),
+                noises: {
+                    clientRectsFactor: 1.0 + Math.random() * 0.004,
+                    textMetricsFactor: 1.0 + Math.random() * 0.004,
+                    canvas2d: shuffle([1, 0, 0, 1, 2]),
+                    canvasWebgl: shuffle([2, 1, 1, 0, 1]),
+                    audio: shuffle([0.01, 0.03, 0.01, 0.04, 0.02]),
+                },
+            },
             createdAt: this.#injectedData?.createdAt || Date.now(),
             updatedAt: Date.now(),
         };
 
-        await this.#dbService.saveBrowserProfile(browserProfile);
+        await this.#browserProfileService.saveBrowserProfile(browserProfile);
         this.#dialogRef.close();
     }
 }

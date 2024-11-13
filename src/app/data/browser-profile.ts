@@ -26,13 +26,21 @@ export interface VariablesInfo {
 }
 
 export enum BrowserProfileStatus {
-    Stopped = 0,
-    Running = 1,
+    Idle,
+    Launching,
+    LaunchFailed,
+    Running,
+    Stopping,
+    StopFailed,
 }
 
 export const BrowserProfileStatusText = {
-    [BrowserProfileStatus.Stopped]: 'Stopped',
+    [BrowserProfileStatus.Idle]: 'Idle',
+    [BrowserProfileStatus.Launching]: 'Launching',
+    [BrowserProfileStatus.LaunchFailed]: 'Launch Failed',
     [BrowserProfileStatus.Running]: 'Running',
+    [BrowserProfileStatus.Stopping]: 'Stopping',
+    [BrowserProfileStatus.StopFailed]: 'Stop Failed',
 };
 
 export function getBrowserProfileStatusText(
@@ -43,7 +51,6 @@ export function getBrowserProfileStatusText(
 
 export interface BrowserProfile {
     id: string;
-    status?: BrowserProfileStatus;
     basicInfo: BasicInfo;
     botProfileInfo: BotProfileInfo;
     proxyInfo: ProxyInfo;
@@ -52,4 +59,14 @@ export interface BrowserProfile {
     updatedAt: number;
     lastUsedAt?: number;
     deletedAt?: number;
+    variableValues: {
+        storageQuotaInBytes: number;
+        noises: {
+            clientRectsFactor: number;
+            textMetricsFactor: number;
+            canvas2d: number[];
+            canvasWebgl: number[];
+            audio: number[];
+        };
+    };
 }
