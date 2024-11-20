@@ -233,8 +233,20 @@ export class EditBrowserProfileComponent {
                 noises: {
                     clientRectsFactor: 1.0 + Math.random() * 0.004,
                     textMetricsFactor: 1.0 + Math.random() * 0.004,
-                    canvas2d: shuffle([1, 0, 0, 1, 2]),
-                    canvasWebgl: shuffle([2, 1, 1, 0, 1]),
+                    canvas2d: [
+                        Math.round(Math.random() * 20),
+                        Math.round(Math.random() * 20),
+                        Math.round(Math.random() * 20),
+                        Math.round(Math.random() * 20),
+                        Math.round(Math.random() * 20),
+                    ],
+                    canvasWebgl: [
+                        Math.round(Math.random() * 20),
+                        Math.round(Math.random() * 20),
+                        Math.round(Math.random() * 20),
+                        Math.round(Math.random() * 20),
+                        Math.round(Math.random() * 20),
+                    ],
                     audio: shuffle([0.01, 0.03, 0.01, 0.04, 0.02]),
                 },
             },

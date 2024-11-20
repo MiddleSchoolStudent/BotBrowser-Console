@@ -4,7 +4,7 @@ export interface BasicInfo {
 }
 
 export interface BotProfileInfo {
-    filename?: string;
+    filename: string;
     content?: string;
 }
 
