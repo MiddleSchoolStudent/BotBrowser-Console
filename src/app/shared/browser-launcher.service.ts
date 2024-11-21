@@ -133,18 +133,17 @@ export class BrowserLauncherService {
             browserProfile.variablesInfo.disableConsoleMessage ?? false;
 
         if (browserProfile.proxyInfo?.proxyHost) {
-            botProfileObject.proxy = {
+            const proxyConfig = {
                 server: browserProfile.proxyInfo.proxyHost,
-            };
+            } as any;
+            variables.proxy = proxyConfig;
 
             if (browserProfile.proxyInfo.username) {
-                botProfileObject.proxy.username =
-                    browserProfile.proxyInfo.username;
+                proxyConfig.username = browserProfile.proxyInfo.username;
             }
 
             if (browserProfile.proxyInfo.password) {
-                botProfileObject.proxy.password =
-                    browserProfile.proxyInfo.password;
+                proxyConfig.password = browserProfile.proxyInfo.password;
             }
         }
 
@@ -173,6 +172,12 @@ export class BrowserLauncherService {
 
         const execPath =
             '../BotBrowser-mac/chromium/src/out/Default/Chromium.app/Contents/MacOS/Chromium';
+
+        console.log('Starting browser with profile: ', browserProfile.id);
+        console.log('Bot profile path: ', botProfilePath);
+        console.log('User data dir path: ', userDataDirPath);
+        console.log('Disk cache dir path: ', diskCacheDirPath);
+
         const proc = await Neutralino.os.spawnProcess(
             `${execPath} --allow-pre-commit-input --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-hang-monitor --disable-infobars --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-search-engine-choice-screen --disable-sync --enable-automation --export-tagged-pdf --generate-pdf-document-outline --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --disable-features=Translate,AcceptCHFrame,MediaRouter,OptimizationHints,ProcessPerSiteUpToMainFrameThreshold,IsolateSandboxedIframes --enable-features=PdfOopif about:blank --no-sandbox --disable-blink-features=AutomationControlled --user-data-dir="${userDataDirPath}" --disk-cache-dir="${diskCacheDirPath}" --bot-profile="${botProfilePath}"`
         );
