@@ -236,7 +236,9 @@ export class EditBrowserProfileComponent {
                 },
             },
             createdAt: this.#injectedData?.createdAt || Date.now(),
+            lastUsedAt: this.#injectedData?.lastUsedAt,
             updatedAt: Date.now(),
+            warmupUrls: this.#injectedData?.warmupUrls,
         };
 
         await this.#browserProfileService.saveBrowserProfile(browserProfile);

@@ -1,20 +1,22 @@
 import { inject, Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import * as Neutralino from '@neutralinojs/lib';
+import { cloneDeep } from 'lodash-es';
 import { AppName } from '../const';
 import {
     BrowserProfileStatus,
     type BrowserProfile,
 } from '../data/browser-profile';
-import { BrowserProfileService } from './browser-profile.service';
-import { MatDialog } from '@angular/material/dialog';
+import { SimpleCDP } from '../simple-cdp';
+import { createDirectoryIfNotExists, sleep } from '../utils';
 import { AlertDialogComponent } from './alert-dialog.component';
-import { cloneDeep } from 'lodash-es';
-import { createDirectoryIfNotExists } from '../utils';
+import { BrowserProfileService } from './browser-profile.service';
 
 export interface RunningInfo {
-    id: string;
+    browserProfileId: string;
     status: BrowserProfileStatus;
     spawnProcessInfo?: Neutralino.os.SpawnedProcess;
+    resolver?: any;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -27,10 +29,32 @@ export class BrowserLauncherService {
         Neutralino.events.on('spawnedProcess', (evt) => {
             switch (evt.detail.action) {
                 case 'stdOut':
-                    console.log(evt.detail.data);
+                    console.log('stdOut', evt.detail.data);
                     break;
                 case 'stdErr':
-                    console.error(evt.detail.data);
+                    {
+                        console.error('stdErr', evt.detail.data);
+                        const rgx = /\bws:\/\/.*\/devtools\/browser\/.*\b/;
+                        const match = evt.detail.data.match(rgx);
+                        const wsURL = match?.[0];
+
+                        if (wsURL) {
+                            const runningInfo = Array.from(
+                                this.#runningStatuses.values()
+                            ).find(
+                                (info) =>
+                                    info.spawnProcessInfo?.id === evt.detail.id
+                            );
+
+                            if (!runningInfo) {
+                                throw new Error(
+                                    `No running info found for id: ${evt.detail.id}`
+                                );
+                            }
+
+                            runningInfo.resolver?.resolve(wsURL);
+                        }
+                    }
                     break;
                 case 'exit':
                     console.log(
@@ -81,7 +105,7 @@ export class BrowserLauncherService {
         );
     }
 
-    async run(browserProfile: BrowserProfile): Promise<void> {
+    async run(browserProfile: BrowserProfile, warmup = false): Promise<void> {
         if (
             this.getRunningStatus(browserProfile) !== BrowserProfileStatus.Idle
         ) {
@@ -178,15 +202,95 @@ export class BrowserLauncherService {
         console.log('User data dir path: ', userDataDirPath);
         console.log('Disk cache dir path: ', diskCacheDirPath);
 
-        const proc = await Neutralino.os.spawnProcess(
-            `${execPath} --allow-pre-commit-input --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --disable-default-apps --disable-dev-shm-usage --disable-extensions --disable-hang-monitor --disable-infobars --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-search-engine-choice-screen --disable-sync --enable-automation --export-tagged-pdf --generate-pdf-document-outline --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --disable-features=Translate,AcceptCHFrame,MediaRouter,OptimizationHints,ProcessPerSiteUpToMainFrameThreshold,IsolateSandboxedIframes --enable-features=PdfOopif about:blank --no-sandbox --disable-blink-features=AutomationControlled --user-data-dir="${userDataDirPath}" --disk-cache-dir="${diskCacheDirPath}" --bot-profile="${botProfilePath}"`
-        );
+        const args = [
+            '--allow-pre-commit-input',
+            '--disable-background-networking',
+            '--disable-background-timer-throttling',
+            '--disable-backgrounding-occluded-windows',
+            '--disable-breakpad',
+            '--disable-client-side-phishing-detection',
+            '--disable-component-extensions-with-background-pages',
+            '--disable-component-update',
+            '--disable-default-apps',
+            '--disable-dev-shm-usage',
+            '--disable-extensions',
+            '--disable-hang-monitor',
+            '--disable-infobars',
+            '--disable-ipc-flooding-protection',
+            '--disable-popup-blocking',
+            '--disable-prompt-on-repost',
+            '--disable-renderer-backgrounding',
+            '--disable-search-engine-choice-screen',
+            '--disable-sync',
+            '--enable-automation --export-tagged-pdf',
+            '--generate-pdf-document-outline',
+            '--force-color-profile=srgb',
+            '--metrics-recording-only',
+            '--no-first-run',
+            '--password-store=basic',
+            '--use-mock-keychain',
+            '--disable-features=Translate,AcceptCHFrame,MediaRouter,OptimizationHints,ProcessPerSiteUpToMainFrameThreshold,IsolateSandboxedIframes',
+            '--enable-features=PdfOopif',
+            '--no-sandbox',
+            '--disable-blink-features=AutomationControlled',
+            `--user-data-dir="${userDataDirPath}"`,
+            `--disk-cache-dir="${diskCacheDirPath}"`,
+            `--bot-profile="${botProfilePath}"`,
+        ];
 
-        this.#runningStatuses.set(browserProfile.id, {
-            id: browserProfile.id,
+        const runningInfo: RunningInfo = {
+            browserProfileId: browserProfile.id,
             status: BrowserProfileStatus.Running,
-            spawnProcessInfo: proc,
-        });
+        };
+
+        const warmupUrls = (browserProfile.warmupUrls ?? '').split('\n');
+        if (!warmupUrls.length) warmup = false;
+
+        if (warmup) {
+            args.push('--remote-debugging-port=0');
+            args.push('--remote-allow-origins="*"');
+
+            runningInfo.resolver = {};
+            runningInfo.resolver.promise = new Promise<string>((resolve) => {
+                runningInfo.resolver.resolve = resolve;
+            });
+        }
+
+        const proc = await Neutralino.os.spawnProcess(
+            `${execPath} ${args.join(' ')} about:blank`
+        );
+        runningInfo.spawnProcessInfo = proc;
+
+        this.#runningStatuses.set(browserProfile.id, runningInfo);
+
+        if (warmup) {
+            console.log(
+                'Waiting for WS URL, browserProfile.id: ',
+                browserProfile.id
+            );
+            const wsURL = await runningInfo.resolver.promise;
+            console.log('We got WS URL: ', wsURL);
+
+            const simpleCDP = new SimpleCDP(wsURL);
+            try {
+                await simpleCDP.connect();
+                const targets = await simpleCDP.getTargets();
+                console.log('Targets: ', targets);
+                const pageTarget = targets.find((t) => t.type === 'page');
+                const sessionId = await simpleCDP.attachToTarget(
+                    pageTarget.targetId
+                );
+                console.log('Session ID: ', sessionId);
+
+                for (const warmupUrl of warmupUrls) {
+                    console.log('Navigating to: ', warmupUrl);
+                    await simpleCDP.navigate(sessionId, warmupUrl);
+                    await sleep(10_000);
+                }
+            } finally {
+                simpleCDP.close();
+            }
+        }
     }
 
     async stop(browserProfile: BrowserProfile): Promise<void> {

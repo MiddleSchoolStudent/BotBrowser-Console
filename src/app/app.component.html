@@ -115,6 +115,16 @@
                         <mat-icon>upgrade</mat-icon>
                         <span>Export</span>
                     </button>
+
+                    @if (
+                        browserLauncherService.getRunningStatus(element) ==
+                        BrowserProfileStatus.Idle
+                    ) {
+                        <button mat-menu-item (click)="warmupProfile(element)">
+                            <mat-icon>local_fire_department</mat-icon>
+                            <span>Warmup</span>
+                        </button>
+                    }
                 </mat-menu>
             </td>
         </ng-container>

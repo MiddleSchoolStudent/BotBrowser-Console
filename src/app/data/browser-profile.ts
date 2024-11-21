@@ -57,6 +57,7 @@ export interface BrowserProfile {
     variablesInfo: Partial<VariablesInfo>;
     createdAt: number;
     updatedAt: number;
+    warmupUrls?: string;
     lastUsedAt?: number;
     deletedAt?: number;
     variableValues: {

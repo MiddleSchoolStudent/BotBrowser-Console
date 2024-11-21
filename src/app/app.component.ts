@@ -31,6 +31,7 @@ import { BrowserProfileService } from './shared/browser-profile.service';
 import { ConfirmDialogComponent } from './shared/confirm-dialog.component';
 import { StopPropagationDirective } from './shared/stop-propagation.directive';
 import { compressFolder, decompressZip, formatDateTime } from './utils';
+import { WarmupComponent } from './warmup.component';
 
 @Component({
     selector: 'app-root',
@@ -142,6 +143,18 @@ export class AppComponent implements AfterViewInit {
                 browserProfile
             );
         await compressFolder(browserProfilePath, entry);
+    }
+
+    async warmupProfile(browserProfile: BrowserProfile): Promise<void> {
+        this.#dialog
+            .open(WarmupComponent, { data: browserProfile })
+            .afterClosed()
+            .subscribe(async (result?: string) => {
+                if (!result) return;
+                console.log('Warmup result: ', result);
+
+                await this.browserLauncherService.run(browserProfile, true);
+            });
     }
 
     async importProfile(): Promise<void> {
