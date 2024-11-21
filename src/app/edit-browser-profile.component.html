@@ -13,16 +13,26 @@
                         formControlName="profileName"
                         required
                     />
+                    <mat-error
+                        *ngIf="
+                            basicInfoFormGroup.get('profileName')?.invalid &&
+                            basicInfoFormGroup.get('profileName')?.touched
+                        "
+                    >
+                        Profile name is required.
+                    </mat-error>
                 </mat-form-field>
 
-                <mat-form-field>
-                    <mat-label>Description</mat-label>
-                    <textarea
-                        matInput
-                        formControlName="description"
-                        placeholder="Type a description"
-                    ></textarea>
-                </mat-form-field>
+                @if (true) {
+                    <mat-form-field>
+                        <mat-label>Description</mat-label>
+                        <textarea
+                            matInput
+                            formControlName="description"
+                            placeholder="Type a description"
+                        ></textarea>
+                    </mat-form-field>
+                }
 
                 <div>
                     <button mat-button matStepperNext>Next</button>
@@ -31,25 +41,33 @@
         </mat-step>
 
         <!-- Import profile -->
-        <mat-step [stepControl]="botProfileInfoGroup">
-            @if (botProfileBasicInfo) {
-                <div>
-                    <p>Version: {{ botProfileBasicInfo.version }}</p>
-                    <p>User Agent: {{ botProfileBasicInfo.userAgent }}</p>
-                </div>
-            }
+        @if (true) {
+            <mat-step [stepControl]="botProfileInfoGroup">
+                @if (botProfileBasicInfo) {
+                    <div>
+                        <p>Version: {{ botProfileBasicInfo.version }}</p>
+                        <p>User Agent: {{ botProfileBasicInfo.userAgent }}</p>
+                    </div>
+                }
 
-            <form [formGroup]="botProfileInfoGroup">
-                <ng-template matStepLabel>
-                    {{ isEdit ? 'Replace bot profile' : 'Select bot profile' }}
-                </ng-template>
-                <mat-label>Select a bot profile:</mat-label>
-                <button mat-button (click)="chooseFile()">Choose File</button>
-                <div>
-                    <button mat-button matStepperNext>Next</button>
-                </div>
-            </form>
-        </mat-step>
+                <form [formGroup]="botProfileInfoGroup">
+                    <ng-template matStepLabel>
+                        {{
+                            isEdit
+                                ? 'Replace bot profile'
+                                : 'Select bot profile'
+                        }}
+                    </ng-template>
+                    <mat-label>Select a bot profile:</mat-label>
+                    <button mat-button (click)="chooseFile()">
+                        Choose File
+                    </button>
+                    <div>
+                        <button mat-button matStepperNext>Next</button>
+                    </div>
+                </form>
+            </mat-step>
+        }
 
         <!-- Proxy info -->
         <mat-step [stepControl]="proxyInfoGroup">

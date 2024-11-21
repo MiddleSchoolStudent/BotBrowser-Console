@@ -1,28 +1,28 @@
 export interface BasicInfo {
-    profileName: string;
-    description?: string;
+    profileName: string | null;
+    description?: string | null;
 }
 
 export interface BotProfileInfo {
-    filename: string;
-    content?: string;
+    filename: string | null;
+    content?: string | null;
 }
 
 export interface ProxyInfo {
-    proxyHost?: string;
-    username?: string;
-    password?: string;
+    proxyHost?: string | null;
+    username?: string | null;
+    password?: string | null;
 }
 
 export interface VariablesInfo {
-    locale?: string;
-    timezone?: string;
-    noisesCanvas2d?: boolean;
-    noisesCanvasWebgl?: boolean;
-    noisesClientRectsFactor?: boolean;
-    noisesTextMetricsFactor?: boolean;
-    noisesAudio?: boolean;
-    disableConsoleMessage?: boolean;
+    locale?: string | null;
+    timezone?: string | null;
+    noisesCanvas2d?: boolean | null;
+    noisesCanvasWebgl?: boolean | null;
+    noisesClientRectsFactor?: boolean | null;
+    noisesTextMetricsFactor?: boolean | null;
+    noisesAudio?: boolean | null;
+    disableConsoleMessage?: boolean | null;
 }
 
 export enum BrowserProfileStatus {
@@ -51,10 +51,10 @@ export function getBrowserProfileStatusText(
 
 export interface BrowserProfile {
     id: string;
-    basicInfo: BasicInfo;
-    botProfileInfo: BotProfileInfo;
-    proxyInfo: ProxyInfo;
-    variablesInfo: VariablesInfo;
+    basicInfo: Partial<BasicInfo>;
+    botProfileInfo: Partial<BotProfileInfo>;
+    proxyInfo: Partial<ProxyInfo>;
+    variablesInfo: Partial<VariablesInfo>;
     createdAt: number;
     updatedAt: number;
     lastUsedAt?: number;

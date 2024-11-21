@@ -1,11 +1,6 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import {
-    FormBuilder,
-    FormGroup,
-    FormsModule,
-    ReactiveFormsModule,
-} from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -64,14 +59,40 @@ export class EditBrowserProfileComponent {
     readonly #browserProfileService = inject(BrowserProfileService);
     readonly #browserLauncherService = inject(BrowserLauncherService);
 
+    #injectedData = inject<BrowserProfile | undefined>(MAT_DIALOG_DATA);
     readonly #formBuilder = inject(FormBuilder);
     readonly #dialog = inject(MatDialog);
     readonly #dialogRef = inject(MatDialogRef<EditBrowserProfileComponent>);
 
-    readonly basicInfoFormGroup: FormGroup;
-    readonly botProfileInfoGroup: FormGroup;
-    readonly proxyInfoGroup: FormGroup;
-    readonly variablesInfoGroup: FormGroup;
+    readonly basicInfoFormGroup = this.#formBuilder.group<BasicInfo>({
+        profileName: this.#injectedData?.basicInfo.profileName || 'New Profile',
+        description: this.#injectedData?.basicInfo.description || '',
+    });
+    readonly botProfileInfoGroup = this.#formBuilder.group<BotProfileInfo>({
+        filename: this.#injectedData?.botProfileInfo.filename || '',
+        content: this.#injectedData?.botProfileInfo.content,
+    });
+    readonly proxyInfoGroup = this.#formBuilder.group<ProxyInfo>({
+        proxyHost: this.#injectedData?.proxyInfo.proxyHost || '',
+        username: this.#injectedData?.proxyInfo.username || '',
+        password: this.#injectedData?.proxyInfo.password || '',
+    });
+    readonly variablesInfoGroup = this.#formBuilder.group<VariablesInfo>({
+        locale: this.#injectedData?.variablesInfo.locale ?? 'en-US',
+        noisesCanvas2d:
+            this.#injectedData?.variablesInfo.noisesCanvas2d ?? true,
+        noisesClientRectsFactor:
+            this.#injectedData?.variablesInfo.noisesClientRectsFactor ?? true,
+        noisesCanvasWebgl:
+            this.#injectedData?.variablesInfo.noisesCanvasWebgl ?? true,
+        noisesTextMetricsFactor:
+            this.#injectedData?.variablesInfo.noisesTextMetricsFactor ?? true,
+        noisesAudio: this.#injectedData?.variablesInfo.noisesAudio ?? true,
+        timezone:
+            this.#injectedData?.variablesInfo.timezone ?? 'America/New_York',
+        disableConsoleMessage:
+            this.#injectedData?.variablesInfo.disableConsoleMessage ?? true,
+    });
 
     readonly #localeOptions: string[];
     readonly filteredLocales: Observable<string[]>;
@@ -79,48 +100,10 @@ export class EditBrowserProfileComponent {
     readonly #timezoneOptions: string[];
     readonly filteredTimezones: Observable<string[]>;
 
-    #injectedData = inject<BrowserProfile | undefined>(MAT_DIALOG_DATA);
-
     isEdit = false;
     botProfileBasicInfo: BotProfileBasicInfo | null = null;
 
     constructor() {
-        // init form data
-        this.basicInfoFormGroup = this.#formBuilder.group<BasicInfo>({
-            profileName:
-                this.#injectedData?.basicInfo.profileName || 'New Profile',
-            description: this.#injectedData?.basicInfo.description || '',
-        });
-        this.botProfileInfoGroup = this.#formBuilder.group<BotProfileInfo>({
-            filename: this.#injectedData?.botProfileInfo.filename || '',
-            content: this.#injectedData?.botProfileInfo.content,
-        });
-
-        this.proxyInfoGroup = this.#formBuilder.group<ProxyInfo>({
-            proxyHost: this.#injectedData?.proxyInfo.proxyHost || '',
-            username: this.#injectedData?.proxyInfo.username || '',
-            password: this.#injectedData?.proxyInfo.password || '',
-        });
-        this.variablesInfoGroup = this.#formBuilder.group<VariablesInfo>({
-            locale: this.#injectedData?.variablesInfo.locale ?? 'en-US',
-            noisesCanvas2d:
-                this.#injectedData?.variablesInfo.noisesCanvas2d ?? true,
-            noisesClientRectsFactor:
-                this.#injectedData?.variablesInfo.noisesClientRectsFactor ??
-                true,
-            noisesCanvasWebgl:
-                this.#injectedData?.variablesInfo.noisesCanvasWebgl ?? true,
-            noisesTextMetricsFactor:
-                this.#injectedData?.variablesInfo.noisesTextMetricsFactor ??
-                true,
-            noisesAudio: this.#injectedData?.variablesInfo.noisesAudio ?? true,
-            timezone:
-                this.#injectedData?.variablesInfo.timezone ??
-                'America/New_York',
-            disableConsoleMessage:
-                this.#injectedData?.variablesInfo.disableConsoleMessage ?? true,
-        });
-
         this.#localeOptions = Array.from(
             new Set(
                 ((localesJson as any).default as any[]).map((e) => e.locale)
@@ -219,7 +202,9 @@ export class EditBrowserProfileComponent {
     }
 
     async onConfirmClick(): Promise<void> {
-        // TODO: check form data
+        if (!this.basicInfoFormGroup.valid) {
+            return;
+        }
 
         const browserProfile: BrowserProfile = {
             id: this.#injectedData?.id || uuidv4(),
