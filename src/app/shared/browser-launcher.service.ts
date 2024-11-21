@@ -106,6 +106,7 @@ export class BrowserLauncherService {
 
         const sysTempPath = await Neutralino.os.getPath('temp');
 
+        // Set variables
         const variables = cloneDeep<any>(browserProfile.variableValues);
         if (browserProfile.variablesInfo.locale) {
             variables.locale = browserProfile.variablesInfo.locale;
@@ -130,8 +131,25 @@ export class BrowserLauncherService {
         }
         variables.disableConsoleMessage =
             browserProfile.variablesInfo.disableConsoleMessage ?? false;
+
+        if (browserProfile.proxyInfo?.proxyHost) {
+            botProfileObject.proxy = {
+                server: browserProfile.proxyInfo.proxyHost,
+            };
+
+            if (browserProfile.proxyInfo.username) {
+                botProfileObject.proxy.username =
+                    browserProfile.proxyInfo.username;
+            }
+
+            if (browserProfile.proxyInfo.password) {
+                botProfileObject.proxy.password =
+                    browserProfile.proxyInfo.password;
+        }
+
         botProfileObject.variables = variables;
 
+        // Save bot profile
         const botProfileContent = JSON.stringify(botProfileObject);
         const botProfilesBasePath = `${sysTempPath}/${AppName}/bot-profiles`;
         await createDirectoryIfNotExists(botProfilesBasePath);
@@ -141,6 +159,7 @@ export class BrowserLauncherService {
             botProfileContent
         );
 
+        // Save browser profile
         browserProfile.lastUsedAt = Date.now();
         await this.#browserProfileService.saveBrowserProfile(browserProfile);
 
@@ -149,7 +168,6 @@ export class BrowserLauncherService {
                 browserProfile
             );
         const userDataDirPath = `${browserProfilePath}/user-data-dir`;
-
         const diskCacheDirPath = `${sysTempPath}/${AppName}/disk-cache-dir/${browserProfile.id}`;
 
         const execPath =
