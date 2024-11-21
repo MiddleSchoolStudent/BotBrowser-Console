@@ -145,6 +145,7 @@ export class BrowserLauncherService {
             if (browserProfile.proxyInfo.password) {
                 botProfileObject.proxy.password =
                     browserProfile.proxyInfo.password;
+            }
         }
 
         botProfileObject.variables = variables;
