@@ -3,6 +3,7 @@ import * as Neutralino from '@neutralinojs/lib';
 import { compact } from 'lodash-es';
 import type { BrowserProfile } from '../data/browser-profile';
 import { createDirectoryIfNotExists, getAppDataPath } from '../utils';
+import { AppName } from '../const';
 
 export const kProfileConfigFileName = 'profile-config.json';
 
@@ -10,6 +11,20 @@ export const kProfileConfigFileName = 'profile-config.json';
 export class BrowserProfileService {
     async getBasePath(): Promise<string> {
         const result = await getAppDataPath('browser-profiles');
+        return result;
+    }
+
+    async getBotProfileTempOutputPath(browserProfile: string | BrowserProfile) {
+        const browserProfileId =
+            typeof browserProfile === 'string'
+                ? browserProfile
+                : browserProfile.id;
+
+        const sysTempPath = await Neutralino.os.getPath('temp');
+        const botProfilesBasePath = `${sysTempPath}/${AppName}/bot-profiles`;
+        await createDirectoryIfNotExists(botProfilesBasePath);
+        const result = `${botProfilesBasePath}/${browserProfileId}.json`;
+
         return result;
     }
 
@@ -23,6 +38,26 @@ export class BrowserProfileService {
         const browserProfilePath = `${basePath}/${id}`;
         await createDirectoryIfNotExists(browserProfilePath);
         return browserProfilePath;
+    }
+
+    async getBrowserProfileUserDataDirPath(
+        browserProfile: string | BrowserProfile
+    ) {
+        const basePath = await this.getBrowserProfilePath(browserProfile);
+        const result = `${basePath}/user-data-dir`;
+        return result;
+    }
+
+    async getBrowserProfileDiskCacheDirPath(
+        browserProfile: string | BrowserProfile
+    ) {
+        const browserProfileId =
+            typeof browserProfile === 'string'
+                ? browserProfile
+                : browserProfile.id;
+        const sysTempPath = await Neutralino.os.getPath('temp');
+        const result = `${sysTempPath}/${AppName}/disk-cache-dir/${browserProfileId}`;
+        return result;
     }
 
     async saveBrowserProfile(browserProfile: BrowserProfile): Promise<void> {
@@ -87,5 +122,16 @@ export class BrowserProfileService {
                 this.deleteBrowserProfile(browserProfile)
             )
         );
+    }
+
+    async getTempUserDataDirFilePath(
+        browserProfileId: string
+    ): Promise<string> {
+        const sysTempPath = await Neutralino.os.getPath('temp');
+        const basePath = `${sysTempPath}/${AppName}/user-data-dirs`;
+        await createDirectoryIfNotExists(basePath);
+        const userDataDirFilePath = `${basePath}/${browserProfileId}.zip`;
+
+        return userDataDirFilePath;
     }
 }
