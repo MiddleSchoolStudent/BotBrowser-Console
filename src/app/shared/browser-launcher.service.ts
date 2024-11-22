@@ -194,10 +194,9 @@ export class BrowserLauncherService {
         const userDataDirPath = `${browserProfilePath}/user-data-dir`;
         const diskCacheDirPath = `${sysTempPath}/${AppName}/disk-cache-dir/${browserProfile.id}`;
 
-        const pwd = await Neutralino.os.getEnv('PWD');
         const execPath = await Neutralino.filesystem.getRelativePath(
             './Chromium',
-            pwd
+            NL_PATH
         );
 
         console.log('Starting browser with profile: ', browserProfile.id);
