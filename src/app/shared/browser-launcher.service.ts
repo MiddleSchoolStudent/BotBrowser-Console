@@ -1,3 +1,5 @@
+/// <reference path="../../../www/neutralino.d.ts" />
+
 import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import * as Neutralino from '@neutralinojs/lib';
@@ -196,8 +198,11 @@ export class BrowserLauncherService {
 
         const execPath = await Neutralino.filesystem.getRelativePath(
             './Chromium',
-            NL_PATH
+            NL_CWD
         );
+        console.log('Neutralino NL_PATH: ', NL_PATH);
+        console.log('Neutralino NL_CWD: ', NL_CWD);
+        console.log('Chromium path: ', execPath);
 
         console.log('Starting browser with profile: ', browserProfile.id);
         console.log('Bot profile path: ', botProfilePath);
