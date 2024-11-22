@@ -77,15 +77,20 @@
                 </div>
 
                 <mat-menu #menu="matMenu">
-                    <button mat-menu-item (click)="editProfile(element)">
-                        <mat-icon>edit</mat-icon>
-                        <span>Edit</span>
-                    </button>
-
                     @if (
                         browserLauncherService.getRunningStatus(element) ==
                         BrowserProfileStatus.Idle
                     ) {
+                        <button mat-menu-item (click)="editProfile(element)">
+                            <mat-icon>edit</mat-icon>
+                            <span>Edit</span>
+                        </button>
+
+                        <button mat-menu-item (click)="deleteProfile(element)">
+                            <mat-icon>delete</mat-icon>
+                            <span>Delete</span>
+                        </button>
+
                         <button
                             mat-menu-item
                             (click)="runBrowserProfile(element)"

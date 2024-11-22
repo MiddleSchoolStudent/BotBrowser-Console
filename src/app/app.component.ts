@@ -194,6 +194,24 @@ export class AppComponent implements AfterViewInit {
             });
     }
 
+    deleteProfile(browserProfile: BrowserProfile): void {
+        this.#dialog
+            .open(ConfirmDialogComponent, {
+                data: {
+                    message: `Are you sure you want to delete the profile "${browserProfile.basicInfo.profileName}"?`,
+                },
+            })
+            .afterClosed()
+            .subscribe(async (result: boolean) => {
+                if (!result) return;
+
+                await this.#browserProfileService.deleteBrowserProfiles([
+                    browserProfile.id,
+                ]);
+                await this.refreshProfiles();
+            });
+    }
+
     async refreshProfiles(): Promise<void> {
         const profiles =
             await this.#browserProfileService.getAllBrowserProfiles();
