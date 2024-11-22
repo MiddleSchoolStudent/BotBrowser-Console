@@ -20,7 +20,7 @@
         "window": {
             "title": "BotBrowserConsole",
             "width": 800,
-            "height": 500,
+            "height": 600,
             "minWidth": 400,
             "minHeight": 200,
             "center": true,
@@ -30,7 +30,7 @@
             "maximize": false,
             "hidden": false,
             "resizable": true,
-            "exitProcessOnClose": false,
+            "exitProcessOnClose": true,
             "enableNative": true,
             "useSavedState": true
         }

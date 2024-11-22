@@ -227,6 +227,12 @@ export class AppComponent implements AfterViewInit {
     }
 
     async ngAfterViewInit(): Promise<void> {
+        const envs = await Neutralino.os.getEnvs();
+        console.log('Envs:', envs);
+
+        const config = await Neutralino.app.getConfig();
+        console.log('Config:', config);
+
         this.dataSource.sort = this.sort;
         await this.refreshProfiles();
     }
