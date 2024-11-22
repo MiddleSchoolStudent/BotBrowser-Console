@@ -196,7 +196,7 @@ export class BrowserLauncherService {
         const userDataDirPath = `${browserProfilePath}/user-data-dir`;
         const diskCacheDirPath = `${sysTempPath}/${AppName}/disk-cache-dir/${browserProfile.id}`;
 
-        const execPath = `${NL_CWD}/Chromium`;
+        const execPath = `${NL_PATH}/Chromium`;
         console.log('Neutralino NL_PATH: ', NL_PATH);
         console.log('Neutralino NL_CWD: ', NL_CWD);
         console.log('Chromium path: ', execPath);
