@@ -22,7 +22,6 @@ import { CloneBrowserProfileComponent } from './clone-browser-profile.component'
 import { AppName } from './const';
 import {
     BrowserProfileStatus,
-    getBrowserProfileStatusText,
     type BrowserProfile,
 } from './data/browser-profile';
 import { EditBrowserProfileComponent } from './edit-browser-profile.component';
@@ -59,7 +58,6 @@ export class AppComponent implements AfterViewInit {
     readonly AppName = AppName;
     readonly #dialog = inject(MatDialog);
     readonly formatDateTime = formatDateTime;
-    readonly getBrowserProfileStatusText = getBrowserProfileStatusText;
     readonly BrowserProfileStatus = BrowserProfileStatus;
     readonly displayedColumns = [
         'select',
@@ -233,7 +231,27 @@ export class AppComponent implements AfterViewInit {
         const config = await Neutralino.app.getConfig();
         console.log('Config:', config);
 
+        console.log('MatSort:', this.sort);
         this.dataSource.sort = this.sort;
+        this.dataSource.sortingDataAccessor = (data, sortHeaderId) => {
+            switch (sortHeaderId) {
+                case 'name':
+                    return data.basicInfo.profileName ?? '';
+                case 'group':
+                    return data.basicInfo.groupName ?? '';
+                case 'status':
+                    return this.browserLauncherService.getRunningStatus(data);
+                case 'lastUsedAt':
+                    return data.lastUsedAt ?? 0;
+                case 'updatedAt':
+                    return data.updatedAt ?? 0;
+                case 'createdAt':
+                    return data.createdAt ?? 0;
+                default:
+                    return '';
+            }
+        };
+
         await this.refreshProfiles();
     }
 

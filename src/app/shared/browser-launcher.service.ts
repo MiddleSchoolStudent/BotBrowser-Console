@@ -7,6 +7,7 @@ import { cloneDeep } from 'lodash-es';
 import { AppName } from '../const';
 import {
     BrowserProfileStatus,
+    getBrowserProfileStatusText,
     type BrowserProfile,
 } from '../data/browser-profile';
 import { SimpleCDP } from '../simple-cdp';
@@ -104,6 +105,12 @@ export class BrowserLauncherService {
                 : browserProfile.id;
         return (
             this.#runningStatuses.get(id)?.status ?? BrowserProfileStatus.Idle
+        );
+    }
+
+    getRunningStatusText(browserProfile: string | BrowserProfile): string {
+        return getBrowserProfileStatusText(
+            this.getRunningStatus(browserProfile)
         );
     }
 
@@ -289,7 +296,7 @@ export class BrowserLauncherService {
                 for (const warmupUrl of warmupUrls) {
                     console.log('Navigating to: ', warmupUrl);
                     await simpleCDP.navigate(sessionId, warmupUrl);
-                    await sleep(10_000);
+                    await sleep(Math.floor(Math.random() * 8000) + 5000);
                 }
             } finally {
                 simpleCDP.close();
