@@ -19,7 +19,7 @@
     "modes": {
         "window": {
             "title": "BotBrowserConsole",
-            "width": 800,
+            "width": 1000,
             "height": 600,
             "minWidth": 400,
             "minHeight": 200,
