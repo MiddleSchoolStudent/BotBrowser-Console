@@ -1,27 +1,92 @@
 # BotBrowserConsole
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.8.
+BotBrowserConsole is the desktop application for **[BotBrowser](https://github.com/MiddleSchoolStudent/BotBrowser)**, designed to simplify fingerprint configuration and multi-account management. Similar to products like **GoLogin** and **MultiLogin**, BotBrowserConsole offers powerful tools for managing multiple browser profiles and streamlining team collaboration. It also supports API-based secondary development to meet custom requirements.
 
-## Development server
+<img width="905" alt="image" src="https://github.com/user-attachments/assets/3f632574-c8a3-4630-86ec-5730534db47b">
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Features
 
-## Code scaffolding
+1. **Create Browser Profiles**
+   Easily set up browser profiles for various accounts and use cases.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+2. **Fingerprint Configuration**
+   Choose from a library of fingerprint configuration files to ensure each profile is unique.
 
-## Build
+3. **Proxy Setup**
+   Configure proxies for individual profiles to ensure secure and anonymous browsing.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+4. **Add Fingerprint Noise**
+   Customize fingerprint noise to make browser activity more indistinguishable from real users.
 
-## Running unit tests
+5. **Clone Configuration**
+   Duplicate existing profiles for faster setup and configuration management.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+6. **Run Multiple Isolated Browsers**
+   Launch multiple independent browsers with complete data isolation.
 
-## Running end-to-end tests
+7. **Preheat Fingerprint Browsers**
+   Prewarm profiles by simulating browsing activity to create more realistic cookies.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+8. **Import & Export Profiles**
 
-## Further help
+    BotBrowserConsole allows you to export and import profiles, making it easier for teams to share configurations and maintain consistency across multiple devices and members.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+9. **Group Configurations**
+   Organize profiles and settings into groups for better management and accessibility.
+
+## Technical Details
+
+-   **Frontend Framework**: Angular 19
+-   **UI Components**: Angular Material
+-   **Application Runtime**: Neutralino.js
+
+## How to Use the App
+
+Follow these steps to set up and run BotBrowserConsole:
+
+1. **Install Neutralino CLI**
+   Install the Neutralino CLI globally.
+
+    ```
+    npm i -g @neutralinojs/neu
+    ```
+
+2. **Install Dependencies**
+   Install the necessary project dependencies.
+
+    ```
+    npm ci
+    ```
+
+3. **Build the Application**
+   Build the project.
+
+    ```
+    npm run build
+    ```
+
+4. **Run the Application**
+   Start the application.
+
+    ```
+    npm run app
+    ```
+
+## API Support for Developers
+
+For advanced users, BotBrowserConsole provides **API-based secondary development**, enabling seamless integration into custom workflows and automation processes.
+
+## Getting Started
+
+1. Download and install BotBrowserConsole.
+2. Create your first browser profile.
+3. Configure fingerprints, proxies, and additional settings.
+4. Start managing your accounts with ease!
+
+## Contact
+
+For support or inquiries, feel free to contact us at [middleschoolstudent@mail.ru](middleschoolstudent@mail.ru).
+
+---
+
+**BotBrowserConsole** – Simplifying browser fingerprint management for professionals.
