@@ -1,4 +1,4 @@
-/// <reference path="../../../www/neutralino.d.ts" />
+/// <reference path="../../neutralino/neutralino.d.ts" />
 
 import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';

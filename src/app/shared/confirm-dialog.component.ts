@@ -1,4 +1,4 @@
-import { AsyncPipe, CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, inject, Inject } from '@angular/core';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,7 +24,6 @@ import { MatStepperModule } from '@angular/material/stepper';
         MatButtonModule,
         MatStepperModule,
         MatAutocompleteModule,
-        AsyncPipe,
     ],
     templateUrl: './confirm-dialog.component.html',
 })

@@ -1,11 +1,17 @@
 import * as Neutralino from '@neutralinojs/lib';
-import moment from 'moment';
 import { AppName } from './const';
 
 export function formatDateTime(ts?: number | Date | null): string {
     if (!ts) return '';
     const date = typeof ts === 'number' ? new Date(ts) : ts;
-    return moment(date).format('YYYY-MM-DD HH:mm:ss');
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
 export async function createDirectoryIfNotExists(path: string): Promise<void> {

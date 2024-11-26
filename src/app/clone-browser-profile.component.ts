@@ -1,4 +1,4 @@
-import { AsyncPipe, CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -23,7 +23,6 @@ import { MatStepperModule } from '@angular/material/stepper';
         MatButtonModule,
         MatStepperModule,
         MatAutocompleteModule,
-        AsyncPipe,
     ],
     templateUrl: './clone-browser-profile.component.html',
     styleUrl: './clone-browser-profile.component.scss',

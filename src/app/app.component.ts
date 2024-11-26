@@ -48,7 +48,6 @@ import { WarmupComponent } from './warmup.component';
         MatToolbarModule,
         MatIconModule,
         StopPropagationDirective,
-        ConfirmDialogComponent,
     ],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
