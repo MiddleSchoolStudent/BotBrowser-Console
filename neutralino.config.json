@@ -20,7 +20,7 @@
         "window": {
             "title": "BotBrowserConsole",
             "width": 1000,
-            "height": 600,
+            "height": 800,
             "minWidth": 400,
             "minHeight": 200,
             "center": true,

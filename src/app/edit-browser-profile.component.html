@@ -4,7 +4,7 @@
         <!-- Basic info -->
         <mat-step [stepControl]="basicInfoFormGroup">
             <form [formGroup]="basicInfoFormGroup">
-                <ng-template matStepLabel>Fill out profile name</ng-template>
+                <ng-template matStepLabel>Basic information</ng-template>
                 <mat-form-field>
                     <mat-label>Name</mat-label>
                     <input
@@ -21,6 +21,29 @@
                     >
                         Profile name is required.
                     </mat-error>
+                </mat-form-field>
+
+                <mat-form-field>
+                    <mat-label>Group</mat-label>
+                    <input
+                        matInput
+                        placeholder="Group name"
+                        formControlName="groupName"
+                        [matAutocomplete]="groupNameAuto"
+                    />
+                    <mat-autocomplete
+                        autoActiveFirstOption
+                        #groupNameAuto="matAutocomplete"
+                    >
+                        @for (
+                            groupName of filteredGroupNames | async;
+                            track groupName
+                        ) {
+                            <mat-option [value]="groupName">
+                                {{ groupName }}
+                            </mat-option>
+                        }
+                    </mat-autocomplete>
                 </mat-form-field>
 
                 @if (true) {
@@ -52,11 +75,7 @@
 
                 <form [formGroup]="botProfileInfoGroup">
                     <ng-template matStepLabel>
-                        {{
-                            isEdit
-                                ? 'Replace bot profile'
-                                : 'Select bot profile'
-                        }}
+                        {{ isEdit ? 'Replace Bot profile' : 'Bot profile' }}
                     </ng-template>
                     <mat-label>Select a bot profile:</mat-label>
                     <button mat-button (click)="chooseFile()">
@@ -72,7 +91,7 @@
         <!-- Proxy info -->
         <mat-step [stepControl]="proxyInfoGroup">
             <form [formGroup]="proxyInfoGroup">
-                <ng-template matStepLabel>Fill out proxy info</ng-template>
+                <ng-template matStepLabel>Proxy information</ng-template>
                 <mat-form-field>
                     <mat-label>Proxy</mat-label>
                     <input
@@ -108,7 +127,7 @@
         <!-- Variable info -->
         <mat-step [stepControl]="variablesInfoGroup">
             <form [formGroup]="variablesInfoGroup">
-                <ng-template matStepLabel>Fill out variable info</ng-template>
+                <ng-template matStepLabel>Other configurations</ng-template>
                 <mat-form-field>
                     <mat-label>Locale</mat-label>
                     <input

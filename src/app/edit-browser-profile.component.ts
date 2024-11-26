@@ -14,7 +14,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatStepperModule } from '@angular/material/stepper';
 import * as Neutralino from '@neutralinojs/lib';
-import { shuffle } from 'lodash-es';
+import { compact, shuffle } from 'lodash-es';
 import { map, startWith, type Observable } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -60,14 +60,27 @@ export class EditBrowserProfileComponent {
     readonly #browserLauncherService = inject(BrowserLauncherService);
 
     #injectedData = inject<BrowserProfile | undefined>(MAT_DIALOG_DATA);
+
     readonly #formBuilder = inject(FormBuilder);
     readonly #dialog = inject(MatDialog);
     readonly #dialogRef = inject(MatDialogRef<EditBrowserProfileComponent>);
 
     readonly basicInfoFormGroup = this.#formBuilder.group<BasicInfo>({
         profileName: this.#injectedData?.basicInfo.profileName || 'New Profile',
+        groupName: this.#injectedData?.basicInfo.groupName || '',
         description: this.#injectedData?.basicInfo.description || '',
     });
+    #groupNames: string[] = [];
+    readonly filteredGroupNames = this.basicInfoFormGroup.valueChanges.pipe(
+        startWith(this.basicInfoFormGroup.value),
+        map((value) => {
+            const filterValue = value.groupName?.toLowerCase();
+            return this.#groupNames.filter((option) =>
+                option.toLowerCase().includes(filterValue || '')
+            );
+        })
+    );
+
     readonly botProfileInfoGroup = this.#formBuilder.group<BotProfileInfo>({
         filename: this.#injectedData?.botProfileInfo.filename || '',
         content: this.#injectedData?.botProfileInfo.content,
@@ -154,6 +167,12 @@ export class EditBrowserProfileComponent {
                 );
             }
         }
+
+        this.#browserProfileService.getAllBrowserProfiles().then((profiles) => {
+            this.#groupNames = compact(
+                profiles.map((profile) => profile.basicInfo.groupName)
+            );
+        });
     }
 
     async chooseFile(): Promise<void> {
@@ -214,7 +233,7 @@ export class EditBrowserProfileComponent {
             variablesInfo: this.variablesInfoGroup.value,
             variableValues: this.#injectedData?.variableValues || {
                 storageQuotaInBytes:
-                    596797550000 + Math.floor(Math.random() * 1000000),
+                    590000000000 + Math.floor(Math.random() * 9000000000),
                 noises: {
                     clientRectsFactor: 1.0 + Math.random() * 0.004,
                     textMetricsFactor: 1.0 + Math.random() * 0.004,

@@ -1,5 +1,6 @@
 export interface BasicInfo {
     profileName: string | null;
+    groupName?: string | null;
     description?: string | null;
 }
 

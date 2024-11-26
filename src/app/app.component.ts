@@ -64,6 +64,7 @@ export class AppComponent implements AfterViewInit {
     readonly displayedColumns = [
         'select',
         'name',
+        'group',
         'status',
         'lastUsedAt',
         'updatedAt',
