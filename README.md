@@ -7,32 +7,40 @@ BotBrowserConsole is the desktop application for **[BotBrowser](https://github.c
 ## Features
 
 1. **Create Browser Profiles**
-   Easily set up browser profiles for various accounts and use cases.
+
+    Easily set up browser profiles for various accounts and use cases.
 
 2. **Fingerprint Configuration**
-   Choose from a library of fingerprint configuration files to ensure each profile is unique.
+
+    Choose from a library of fingerprint configuration files to ensure each profile is unique.
 
 3. **Proxy Setup**
-   Configure proxies for individual profiles to ensure secure and anonymous browsing.
+
+    Configure proxies for individual profiles to ensure secure and anonymous browsing.
 
 4. **Add Fingerprint Noise**
-   Customize fingerprint noise to make browser activity more indistinguishable from real users.
+
+    Customize fingerprint noise to make browser activity more indistinguishable from real users.
 
 5. **Clone Configuration**
-   Duplicate existing profiles for faster setup and configuration management.
+
+    Duplicate existing profiles for faster setup and configuration management.
 
 6. **Run Multiple Isolated Browsers**
-   Launch multiple independent browsers with complete data isolation.
+
+    Launch multiple independent browsers with complete data isolation.
 
 7. **Preheat Fingerprint Browsers**
-   Prewarm profiles by simulating browsing activity to create more realistic cookies.
+
+    Prewarm profiles by simulating browsing activity to create more realistic cookies.
 
 8. **Import & Export Profiles**
 
     BotBrowserConsole allows you to export and import profiles, making it easier for teams to share configurations and maintain consistency across multiple devices and members.
 
 9. **Group Configurations**
-   Organize profiles and settings into groups for better management and accessibility.
+
+    Organize profiles and settings into groups for better management and accessibility.
 
 ## Technical Details
 
