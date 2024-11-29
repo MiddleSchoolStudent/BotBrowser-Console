@@ -2,7 +2,7 @@
 
 BotBrowserConsole is the desktop application for **[BotBrowser](https://github.com/MiddleSchoolStudent/BotBrowser)**, designed to simplify fingerprint configuration and multi-account management. Similar to products like **GoLogin** and **MultiLogin**, BotBrowserConsole offers powerful tools for managing multiple browser profiles and streamlining team collaboration. It also supports API-based secondary development to meet custom requirements.
 
-<img width="905" alt="image" src="https://github.com/user-attachments/assets/85431c84-95bc-43ff-997d-639ecfc2d7b7">
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/e9c0b656-83b0-4be5-986e-d4bc3c04b4b5">
 
 ## Features
 
