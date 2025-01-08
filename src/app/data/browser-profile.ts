@@ -24,6 +24,7 @@ export interface VariablesInfo {
     noisesTextMetricsFactor?: boolean | null;
     noisesAudio?: boolean | null;
     disableConsoleMessage?: boolean | null;
+    botBrowserBinaryPath?: string | null;
 }
 
 export enum BrowserProfileStatus {
@@ -61,9 +62,9 @@ export interface BrowserProfile {
     warmupUrls?: string;
     lastUsedAt?: number;
     deletedAt?: number;
-    variableValues: {
-        storageQuotaInBytes: number;
-        noises: {
+    variableValues?: {
+        storageQuotaInBytes?: number;
+        noises?: {
             clientRectsFactor: number;
             textMetricsFactor: number;
             canvas2d: number[];

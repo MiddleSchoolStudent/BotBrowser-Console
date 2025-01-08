@@ -115,6 +115,9 @@ export class BrowserLauncherService {
     }
 
     async run(browserProfile: BrowserProfile, warmup = false): Promise<void> {
+        const osInfo = await Neutralino.computer.getOSInfo();
+        const osType = osInfo.name;
+
         if (
             this.getRunningStatus(browserProfile) !== BrowserProfileStatus.Idle
         ) {
@@ -203,7 +206,17 @@ export class BrowserLauncherService {
         const userDataDirPath = `${browserProfilePath}/user-data-dir`;
         const diskCacheDirPath = `${sysTempPath}/${AppName}/disk-cache-dir/${browserProfile.id}`;
 
-        const execPath = `${NL_PATH}/Chromium`;
+        let execPath: string;
+        if (browserProfile.variablesInfo.botBrowserBinaryPath) {
+            if (osType.includes('Darwin')) {
+                execPath = `${browserProfile.variablesInfo.botBrowserBinaryPath}/Contents/MacOS/Chromium`;
+            } else {
+                execPath = browserProfile.variablesInfo.botBrowserBinaryPath;
+            }
+        } else {
+            execPath = `${NL_PATH}/Chromium`;
+        }
+
         console.log('Neutralino NL_PATH: ', NL_PATH);
         console.log('Neutralino NL_CWD: ', NL_CWD);
         console.log('Chromium path: ', execPath);
@@ -236,7 +249,6 @@ export class BrowserLauncherService {
             '--password-store=basic',
             '--use-mock-keychain',
             '--disable-features=AcceptCHFrame,MediaRouter,OptimizationHints,ProcessPerSiteUpToMainFrameThreshold,IsolateSandboxedIframes',
-            '--enable-features=PdfOopif',
             '--no-sandbox',
             '--restore-last-session',
             '--disable-blink-features=AutomationControlled',

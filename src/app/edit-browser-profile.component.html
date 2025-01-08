@@ -66,12 +66,19 @@
         <!-- Import profile -->
         @if (true) {
             <mat-step [stepControl]="botProfileInfoGroup">
-                @if (botProfileBasicInfo) {
+                @if (
+                    botProfileBasicInfo &&
+                    !botProfileBasicInfo.isEncryptedProfile
+                ) {
                     <div>
                         <p>Version: {{ botProfileBasicInfo.version }}</p>
                         <p>User Agent: {{ botProfileBasicInfo.userAgent }}</p>
                     </div>
                 }
+
+                <mat-error *ngIf="!botProfileInfoGroup?.value?.content">
+                    Bot Profile is required.
+                </mat-error>
 
                 <form [formGroup]="botProfileInfoGroup">
                     <ng-template matStepLabel>
@@ -125,89 +132,130 @@
         </mat-step>
 
         <!-- Variable info -->
-        <mat-step [stepControl]="variablesInfoGroup">
-            <form [formGroup]="variablesInfoGroup">
-                <ng-template matStepLabel>Other configurations</ng-template>
-                <mat-form-field>
-                    <mat-label>Locale</mat-label>
-                    <input
-                        matInput
-                        placeholder="Input locale"
-                        formControlName="locale"
-                        [matAutocomplete]="localeAuto"
-                    />
-                    <mat-autocomplete
-                        autoActiveFirstOption
-                        #localeAuto="matAutocomplete"
-                    >
-                        @for (option of filteredLocales | async; track option) {
-                            <mat-option [value]="option">
-                                {{ option }}
-                            </mat-option>
-                        }
-                    </mat-autocomplete>
-                </mat-form-field>
+        @if (variablesInfoGroup) {
+            <mat-step [stepControl]="variablesInfoGroup">
+                <form [formGroup]="variablesInfoGroup">
+                    <ng-template matStepLabel>Other configurations</ng-template>
 
-                <mat-form-field>
-                    <mat-label>Timezone</mat-label>
-                    <input
-                        matInput
-                        placeholder="Input timezone"
-                        formControlName="timezone"
-                        [matAutocomplete]="timezoneAuto"
-                    />
-                    <mat-autocomplete
-                        autoActiveFirstOption
-                        #timezoneAuto="matAutocomplete"
-                    >
-                        @for (
-                            option of filteredTimezones | async;
-                            track option
-                        ) {
-                            <mat-option [value]="option">
-                                {{ option }}
-                            </mat-option>
-                        }
-                    </mat-autocomplete>
-                </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>Locale</mat-label>
+                        <input
+                            matInput
+                            placeholder="Input locale"
+                            formControlName="locale"
+                            [matAutocomplete]="localeAuto"
+                        />
+                        <mat-autocomplete
+                            autoActiveFirstOption
+                            #localeAuto="matAutocomplete"
+                        >
+                            @for (
+                                option of filteredLocales | async;
+                                track option
+                            ) {
+                                <mat-option [value]="option">
+                                    {{ option }}
+                                </mat-option>
+                            }
+                        </mat-autocomplete>
+                    </mat-form-field>
 
-                <p>
-                    <mat-checkbox formControlName="disableConsoleMessage">
-                        Prevent CDP detection
-                    </mat-checkbox>
-                </p>
+                    @if (
+                        botProfileBasicInfo &&
+                        !botProfileBasicInfo.isEncryptedProfile
+                    ) {
+                        <mat-form-field>
+                            <mat-label>Timezone</mat-label>
+                            <input
+                                matInput
+                                placeholder="Input timezone"
+                                formControlName="timezone"
+                                [matAutocomplete]="timezoneAuto"
+                            />
+                            <mat-autocomplete
+                                autoActiveFirstOption
+                                #timezoneAuto="matAutocomplete"
+                            >
+                                @for (
+                                    option of filteredTimezones | async;
+                                    track option
+                                ) {
+                                    <mat-option [value]="option">
+                                        {{ option }}
+                                    </mat-option>
+                                }
+                            </mat-autocomplete>
+                        </mat-form-field>
 
-                <p>
-                    <mat-checkbox formControlName="noisesCanvas2d">
-                        Add noise to 2D canvas
-                    </mat-checkbox>
-                </p>
+                        <p>
+                            <mat-checkbox
+                                formControlName="disableConsoleMessage"
+                            >
+                                Prevent CDP detection
+                            </mat-checkbox>
+                        </p>
 
-                <p>
-                    <mat-checkbox formControlName="noisesCanvasWebgl">
-                        Add noise to WebGL canvas
-                    </mat-checkbox>
-                </p>
+                        <p>
+                            <mat-checkbox formControlName="noisesCanvas2d">
+                                Add noise to 2D canvas
+                            </mat-checkbox>
+                        </p>
 
-                <p>
-                    <mat-checkbox formControlName="noisesClientRectsFactor">
-                        Add noise to DOM rects
-                    </mat-checkbox>
-                </p>
+                        <p>
+                            <mat-checkbox formControlName="noisesCanvasWebgl">
+                                Add noise to WebGL canvas
+                            </mat-checkbox>
+                        </p>
 
-                <p>
-                    <mat-checkbox formControlName="noisesTextMetricsFactor">
-                        Add noise to text metrics
-                    </mat-checkbox>
-                </p>
+                        <p>
+                            <mat-checkbox
+                                formControlName="noisesClientRectsFactor"
+                            >
+                                Add noise to DOM rects
+                            </mat-checkbox>
+                        </p>
 
-                <p>
-                    <mat-checkbox formControlName="noisesAudio">
-                        Add noise to audio
-                    </mat-checkbox>
-                </p>
-            </form>
-        </mat-step>
+                        <p>
+                            <mat-checkbox
+                                formControlName="noisesTextMetricsFactor"
+                            >
+                                Add noise to text metrics
+                            </mat-checkbox>
+                        </p>
+
+                        <p>
+                            <mat-checkbox formControlName="noisesAudio">
+                                Add noise to audio
+                            </mat-checkbox>
+                        </p>
+                    }
+
+                    <mat-form-field>
+                        <mat-label
+                            >Path of the BotBrowser executable
+                            (optional)</mat-label
+                        >
+                        <input
+                            matInput
+                            formControlName="botBrowserBinaryPath"
+                        />
+
+                        <mat-error
+                            *ngIf="
+                                variablesInfoGroup.get('botBrowserBinaryPath')
+                                    ?.errors?.invalidBotBrowserPath
+                            "
+                        >
+                            {{
+                                variablesInfoGroup.getError(
+                                    'invalidBotBrowserPath'
+                                )
+                            }}
+                        </mat-error>
+                    </mat-form-field>
+                </form>
+            </mat-step>
+        }
     </mat-stepper>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
