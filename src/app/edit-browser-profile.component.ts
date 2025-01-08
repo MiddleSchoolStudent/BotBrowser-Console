@@ -60,7 +60,7 @@ export function botBrowserPathValidator(
 
         // Skip validation if the field is empty
         if (!botBrowserBinaryPath) {
-            botBrowserBinaryPathControl.setErrors(null);
+            botBrowserBinaryPathControl?.setErrors(null);
             return null;
         }
 
